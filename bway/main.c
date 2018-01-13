@@ -6,13 +6,18 @@
 
 #include <wlr/util/log.h>
 
+#include "bway/config.h"
+#include "bway/server.h"
+
 #define BWAY_VERSION 0.1 // TODO: Move that elsewhere
+
+struct bway_server server = {0};
 
 int main(int argc, char *argv[])
 {
     static int verbose = 0, debug = 0;
 
-    char* config_path = NULL;
+    char* config_file = NULL;
 
     const char* usage = 
         "Usage: bway [option]\n"
@@ -21,6 +26,7 @@ int main(int argc, char *argv[])
         " -c, --config\t\tSpecify a configuration file\n"
         " -v, --version\t\tShow the version number and exits\n"
         " -V, --verbose\t\tEnable verbose output\n"
+        " -d, --debug\t\tEnable debug output\n"
         "\n";
 
     static struct option long_options[] = {
@@ -33,7 +39,7 @@ int main(int argc, char *argv[])
     };
 
     int opt;
-    while ((opt = getopt_long(argc, argv, "hcvVd:", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hc:vVd", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -42,8 +48,8 @@ int main(int argc, char *argv[])
 			    exit(EXIT_SUCCESS);
                 break;
             case 'c':
-                config_path = malloc(strlen(optarg) + 1);
-                strcpy(config_path, optarg);
+                config_file = malloc(strlen(optarg) + 1);
+                strcpy(config_file, optarg);
                 break;
             case 'v':
                 printf("%f\n", BWAY_VERSION);
@@ -70,7 +76,34 @@ int main(int argc, char *argv[])
     {
         wlr_log_init(L_ERROR, NULL);
     }
-    
+
+    // config is loaded last
+
+    // If no config_file is given, the default one is
+    // $HOME/.config/bway/bwayrc
+    if (config_file == NULL)
+    {
+        char* config_dir = getenv("XDG_CONFIG_HOME");
+        if(config_dir == NULL)
+        {
+            wlr_log(L_ERROR, "Failed to get XDG_CONFIG_HOME environment variable");
+        }
+        
+        const char* bwayrc_file = "/bway/bwayrc";
+        
+        config_file = malloc(strlen(config_dir) + strlen(bwayrc_file));
+        config_file[0] = '\0';
+
+        strcat(config_file, config_dir);
+        strcat(config_file, bwayrc_file);
+    }
+
+    if(!load_config_file(config_file))
+    {
+        exit(EXIT_SUCCESS);
+    }
+
+    free(config_file);
 
     return 0;
 }

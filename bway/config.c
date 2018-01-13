@@ -1,0 +1,16 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include <wlr/util/log.h>
+
+#include "bway/config.h"
+
+// config file is executed.
+// TODO: find a more explicative name?
+bool load_config_file(const char* file)
+{
+    wlr_log(L_INFO, "Loading config file %s", file);
+
+    return true;
+}
+
