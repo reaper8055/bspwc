@@ -4,11 +4,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <wlr/util/log.h>
+
 #define BWAY_VERSION 0.1 // TODO: Move that elsewhere
 
 int main(int argc, char *argv[])
 {
-    static int verbose = 0;
+    static int verbose = 0, debug = 0;
 
     char* config_path = NULL;
 
@@ -26,11 +28,12 @@ int main(int argc, char *argv[])
         {"config", required_argument, NULL, 'c'},
         {"version", no_argument, NULL, 'v'},
         {"verbose", no_argument, NULL, 'V'},
+        {"debug", no_argument, NULL, 'd'},
         {0, 0, 0, 0}
     };
 
     int opt;
-    while ((opt = getopt_long(argc, argv, "hcvV:", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hcvVd:", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -49,8 +52,25 @@ int main(int argc, char *argv[])
             case 'V':
                 verbose = 1;
                 break;
+            case 'd':
+                debug = 1;
+                break;
         }
     }
+
+    if (debug)
+    {
+        wlr_log_init(L_DEBUG, NULL);
+    }
+    else if (verbose)
+    {
+        wlr_log_init(L_INFO, NULL);
+    }
+    else
+    {
+        wlr_log_init(L_ERROR, NULL);
+    }
+    
 
     return 0;
 }
