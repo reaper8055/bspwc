@@ -10,8 +10,11 @@ struct bway_server
 
 	struct wlr_backend *backend;
     struct wlr_renderer *renderer;
+
+
 };
 
-bool init_server(struct bway_server *s);
+bool init_server(struct bway_server* s);
+bool terminate_server(struct bway_server* s);
 
 #endif // SERVER_H

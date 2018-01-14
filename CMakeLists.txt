@@ -10,11 +10,15 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -g")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -Wextra -Wfatal-errors -Wpedantic -ggdb")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -Wno-warnings")
 
+set(CMAKE_C_STANDARD 11)
+
+find_package(Wayland REQUIRED)
 find_package(wlroots REQUIRED)
 
 include_directories(
     include/
-    ${WLROOTS_INCLUDE_DIR}    
+    ${WAYLAND_INCLUDE_DIR}
+    ${WLROOTS_INCLUDE_DIR} 
 )
 
 add_executable(bway
@@ -23,8 +27,8 @@ add_executable(bway
     bway/server.c
 )
 
-set_property(TARGET bway PROPERTY C_STANDARD 11)
 
 target_link_libraries(bway
+    ${WAYLAND_SERVER_LIBRARIES}
     ${WLROOTS_LIBRARY}
 )

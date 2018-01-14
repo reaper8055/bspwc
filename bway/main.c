@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
         wlr_log_init(L_ERROR, NULL);
     }
 
+    init_server(&server);
+
     // config is loaded last
 
     // If no config_file is given, the default one is
@@ -100,10 +102,15 @@ int main(int argc, char *argv[])
 
     if(!load_config_file(config_file))
     {
+        terminate_server(&server);
         exit(EXIT_SUCCESS);
     }
 
     free(config_file);
+
+    wl_display_run(server.wl_display);
+
+    terminate_server(&server);
 
     return 0;
 }
