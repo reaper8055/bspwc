@@ -29,7 +29,8 @@ bool terminate_server(struct bway_server* s)
 {
     wlr_log(L_INFO, "Terminating bway server");
 
-    wlr_backend_destroy(s.backend);
+    wlr_backend_destroy(s->backend);
+    wl_display_destroy(s->wl_display);
 
     return true;
 }
