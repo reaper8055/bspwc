@@ -4,14 +4,16 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <wayland-server.h>
+
 #include <wlr/util/log.h>
 
-#include "bway/config.h"
+#include <bway/config.h>
 #include "bway/server.h"
 
 #define BWAY_VERSION 0.1 // TODO: Move that elsewhere
 
-struct bway_server server = {0};
+struct bway_server server;
 
 int main(int argc, char *argv[])
 {
@@ -85,28 +87,39 @@ int main(int argc, char *argv[])
     // $HOME/.config/bway/bwayrc
     if (config_file == NULL)
     {
-        char* config_dir = getenv("XDG_CONFIG_HOME");
-        if(config_dir == NULL)
+        char* home_dir = getenv("HOME");
+        if(home_dir == NULL)
         {
-            wlr_log(L_ERROR, "Failed to get XDG_CONFIG_HOME environment variable");
+            wlr_log(L_ERROR, "Failed to get HOME environment variable");
         }
         
-        const char* bwayrc_file = "/bway/bwayrc";
+        const char* cfg_file = ".config/bway/bwayrc";
         
-        config_file = malloc(strlen(config_dir) + strlen(bwayrc_file));
+        config_file = malloc(strlen(home_dir) + strlen(cfg_file));
         config_file[0] = '\0';
 
-        strcat(config_file, config_dir);
-        strcat(config_file, bwayrc_file);
+        strcat(config_file, home_dir);
+        strcat(config_file, cfg_file);
     }
 
     if(!load_config_file(config_file))
     {
         terminate_server(&server);
-        exit(EXIT_SUCCESS);
+        exit(EXIT_FAILURE);
     }
 
     free(config_file);
+
+    const char* socket = wl_display_add_socket_auto(server.wl_display);
+	if (!socket)
+    {
+		wlr_log(L_ERROR, "Unable to open wayland socket");
+        terminate_server(&server);
+		return 1;
+    }
+
+    wlr_log(L_INFO, "Running bway on wayland display '%s'", socket);
+    setenv("_WAYLAND_DISPLAY", socket, true);
 
     wl_display_run(server.wl_display);
 
