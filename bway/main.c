@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200112L
+
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +10,7 @@
 
 #include <wlr/util/log.h>
 
-#include <bway/config.h>
+#include "bway/config.h"
 #include "bway/server.h"
 
 #define BWAY_VERSION 0.1 // TODO: Move that elsewhere
@@ -119,7 +121,7 @@ int main(int argc, char *argv[])
     }
 
     wlr_log(L_INFO, "Running bway on wayland display '%s'", socket);
-    setenv("_WAYLAND_DISPLAY", socket, true);
+    setenv("WAYLAND_DISPLAY", socket, true);
 
     wl_display_run(server.wl_display);
 
