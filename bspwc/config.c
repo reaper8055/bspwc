@@ -2,7 +2,7 @@
 
 #include <wlr/util/log.h>
 
-#include "bway/config.h"
+#include "bspwc/config.h"
 
 // config file is executed.
 // TODO: find a more explicative name?

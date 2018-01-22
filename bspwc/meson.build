@@ -1,18 +1,19 @@
-bway_src = files(
+bspwc_src = files(
     'main.c',
     'config.c',
-    'server.c',
+    'desktop.c',
+    'bspwc.c',
 )
 
-bway_deps = [
+bspwc_deps = [
     wayland_server,
     wlroots,
 ]
 
 executable(
-    'bway',
-    bway_src,
+    'bspwc',
+    bspwc_src,
     include_directories: [inc_folder],
-    dependencies: bway_deps,
+    dependencies: bspwc_deps,
     install: true 
 )

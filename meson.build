@@ -1,5 +1,5 @@
 project(
-	'bway',
+	'bspwc',
 	'c',
 	version: '0.0.1',
 	license: 'MIT',
@@ -19,4 +19,4 @@ wlroots = dependency('wlroots')
 wayland_server = dependency('wayland-server')
 wayland_client = dependency('wayland-client')
 
-subdir('bway')
+subdir('bspwc')

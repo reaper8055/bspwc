@@ -11,12 +11,12 @@
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 
-#include "bway/config.h"
-#include "bway/server.h"
+#include "bspwc/config.h"
+#include "bspwc/bspwc.h"
 
-#define BWAY_VERSION 0.1 // TODO: Move that elsewhere
+#define BSPWC_VERSION 0.1 // TODO: Move that elsewhere
 
-struct bway_server server;
+struct bspwc compositor;
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     char* config_file = NULL;
 
     const char* usage = 
-        "Usage: bway [option]\n"
+        "Usage: bspwc [option]\n"
         "\n"
         " -h, --help\t\tShow this message\n"
         " -c, --config\t\tSpecify a configuration file\n"
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
                 strcpy(config_file, optarg);
                 break;
             case 'v':
-                printf("%f\n", BWAY_VERSION);
+                printf("%f\n", BSPWC_VERSION);
                 exit(EXIT_SUCCESS);
                 break;
             case 'V':
@@ -82,12 +82,12 @@ int main(int argc, char *argv[])
         wlr_log_init(L_ERROR, NULL);
     }
 
-    init_server(&server);
+    init_bspwc(&compositor);
 
     // config is loaded last
 
     // If no config_file is given, the default one is
-    // $HOME/.config/bway/bwayrc
+    // $HOME/.config/bspwc/bspwcrc
     if (config_file == NULL)
     {
         char* home_dir = getenv("HOME");
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
             wlr_log(L_ERROR, "Failed to get HOME environment variable");
         }
         
-        const char* cfg_file = ".config/bway/bwayrc";
+        const char* cfg_file = ".config/bspwc/bspwcrc";
         
         config_file = malloc(strlen(home_dir) + strlen(cfg_file));
         config_file[0] = '\0';
@@ -108,33 +108,33 @@ int main(int argc, char *argv[])
     if (!load_config_file(config_file))
     {
 		wlr_log(L_ERROR, "Failed to load config file");
-        terminate_server(&server);
+        terminate_bspwc(&compositor);
         return 1;
     }
 
     free(config_file);
     
-    const char* wl_socket = wl_display_add_socket_auto(server.wl_display);
+    const char* wl_socket = wl_display_add_socket_auto(compositor.wl_display);
 	if (!wl_socket)
     {
 		wlr_log(L_ERROR, "Unable to open wayland socket");
-        terminate_server(&server);
+        terminate_bspwc(&compositor);
 		return 1;
     }
 
-    wlr_log(L_INFO, "Running bway on wayland display '%s'", wl_socket);
+    wlr_log(L_INFO, "Running bspwc on wayland display '%s'", wl_socket);
     setenv("WAYLAND_DISPLAY", wl_socket, true);
 
-    if (!start_server(&server))
+    if (!start_bspwc(&compositor))
     {
-        wlr_log(L_ERROR, "Failed to start server");
-        terminate_server(&server);
+        wlr_log(L_ERROR, "Failed to start compositor");
+        terminate_bspwc(&compositor);
         return 1;
     }
 
-    wl_display_run(server.wl_display);
+    wl_display_run(compositor.wl_display);
 
-    terminate_server(&server);
+    terminate_bspwc(&compositor);
 
     return 0;
 }
