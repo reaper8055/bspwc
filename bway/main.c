@@ -8,6 +8,7 @@
 
 #include <wayland-server.h>
 
+#include <wlr/backend.h>
 #include <wlr/util/log.h>
 
 #include "bway/config.h"
@@ -104,24 +105,32 @@ int main(int argc, char *argv[])
         strcat(config_file, cfg_file);
     }
 
-    if(!load_config_file(config_file))
+    if (!load_config_file(config_file))
     {
+		wlr_log(L_ERROR, "Failed to load config file");
         terminate_server(&server);
-        exit(EXIT_FAILURE);
+        return 1;
     }
 
     free(config_file);
-
-    const char* socket = wl_display_add_socket_auto(server.wl_display);
-	if (!socket)
+    
+    const char* wl_socket = wl_display_add_socket_auto(server.wl_display);
+	if (!wl_socket)
     {
 		wlr_log(L_ERROR, "Unable to open wayland socket");
         terminate_server(&server);
 		return 1;
     }
 
-    wlr_log(L_INFO, "Running bway on wayland display '%s'", socket);
-    setenv("WAYLAND_DISPLAY", socket, true);
+    wlr_log(L_INFO, "Running bway on wayland display '%s'", wl_socket);
+    setenv("WAYLAND_DISPLAY", wl_socket, true);
+
+    if (!start_server(&server))
+    {
+        wlr_log(L_ERROR, "Failed to start server");
+        terminate_server(&server);
+        return 1;
+    }
 
     wl_display_run(server.wl_display);
 

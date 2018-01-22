@@ -25,6 +25,19 @@ bool init_server(struct bway_server* s)
     return true;
 }
 
+bool start_server(struct bway_server* s)
+{
+    wlr_log(L_INFO, "Starting bway server");
+    
+    if (!wlr_backend_start(s->backend))
+    {
+        wlr_log(L_ERROR, "Failed to start bway backend");
+        return false;
+    }
+
+    return true;
+}
+
 bool terminate_server(struct bway_server* s)
 {
     wlr_log(L_INFO, "Terminating bway server");

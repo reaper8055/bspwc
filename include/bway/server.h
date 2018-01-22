@@ -13,6 +13,7 @@ struct bway_server
 };
 
 bool init_server(struct bway_server* s);
+bool start_server(struct bway_server* s);
 bool terminate_server(struct bway_server* s);
 
 #endif // SERVER_H
