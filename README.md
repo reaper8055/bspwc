@@ -1,11 +1,12 @@
-#BWAY
+# BSPWC
 
-**B**SPWM **Way**land compositor, or **B**l4ckb0ne's **Way**land compositor
+**B**inary **S**pace **P**artitioning **W**ayland **C**ompositor
 
 ### Compiling
 Install dependencies:
 
 * meson
+* wayland
 * [wlroots](https://github.com/swaywm/wlroots)
 
 Run these commands:
