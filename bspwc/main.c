@@ -23,12 +23,14 @@ int main(int argc, char *argv[])
     static int verbose = 0, debug = 0;
 
     char* config_file = NULL;
+    char* bspwm_socket = NULL;
 
     const char* usage = 
         "Usage: bspwc [option]\n"
         "\n"
         " -h, --help\t\tShow this message\n"
         " -c, --config\t\tSpecify a configuration file\n"
+        " -s, --socket\t\tSpecify a socket to use\n"
         " -v, --version\t\tShow the version number and exits\n"
         " -V, --verbose\t\tEnable verbose output\n"
         " -d, --debug\t\tEnable debug output\n"
@@ -37,6 +39,7 @@ int main(int argc, char *argv[])
     static struct option long_options[] = {
         {"help", no_argument, NULL, 'h'},
         {"config", required_argument, NULL, 'c'},
+        {"socket", optional_argument, NULL, 's'},
         {"version", no_argument, NULL, 'v'},
         {"verbose", no_argument, NULL, 'V'},
         {"debug", no_argument, NULL, 'd'},
@@ -44,7 +47,7 @@ int main(int argc, char *argv[])
     };
 
     int opt;
-    while ((opt = getopt_long(argc, argv, "hc:vVd", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hc:s:vVd", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -53,8 +56,12 @@ int main(int argc, char *argv[])
 			    exit(EXIT_SUCCESS);
                 break;
             case 'c':
-                config_file = malloc(strlen(optarg) + 1);
+                config_file = malloc(strlen(optarg));
                 strcpy(config_file, optarg);
+                break;
+            case 's':
+                bspwm_socket = malloc(strlen(optarg));
+                strcpy(bspwm_socket, optarg);
                 break;
             case 'v':
                 printf("%f\n", BSPWC_VERSION);
@@ -83,8 +90,6 @@ int main(int argc, char *argv[])
     }
 
     init_bspwc(&compositor);
-
-    // config is loaded last
 
     // If no config_file is given, the default one is
     // $HOME/.config/bspwc/bspwcrc
