@@ -8,6 +8,7 @@ bspwc_src = files(
 bspwc_deps = [
     wayland_server,
     wlroots,
+    pixman,
 ]
 
 executable(
