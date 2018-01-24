@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 
     free(config_file);
     
-    const char* wl_socket = wl_display_add_socket_auto(compositor.wl_display);
+    const char* wl_socket = wl_display_add_socket_auto(compositor.display);
 	if (!wl_socket)
     {
 		wlr_log(L_ERROR, "Unable to open wayland socket");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    wl_display_run(compositor.wl_display);
+    wl_display_run(compositor.display);
 
     terminate_bspwc(&compositor);
 

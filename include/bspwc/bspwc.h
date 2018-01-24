@@ -5,8 +5,10 @@
 
 struct bspwc
 {
-	struct wl_display* wl_display;
-	struct wl_event_loop* wl_event_loop;
+    struct wlr_data_device_manager* data_device_manager;
+
+	struct wl_display* display;
+	struct wl_event_loop* event_loop;
 
 	struct wlr_backend* backend;
     struct wlr_renderer* renderer;
