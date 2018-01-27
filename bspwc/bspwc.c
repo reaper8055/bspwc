@@ -1,14 +1,6 @@
-#include <wayland-server.h>
-
-#include <wlr/backend.h>
-#include <wlr/render.h>
-#include <wlr/render/gles2.h>
-#include <wlr/types/wlr_data_device.h>
-#include <wlr/util/log.h>
-
 #include "bspwc/bspwc.h"
 
-bool init_bspwc(struct bspwc* s)
+bool init_server(struct bspwc_server* s)
 {
     wlr_log(L_INFO, "Initializing bspwc");
 
@@ -36,7 +28,21 @@ bool init_bspwc(struct bspwc* s)
     return true;
 }
 
-bool start_bspwc(struct bspwc* s)
+bool setup_bspwc(struct bspwc_server* s)
+{
+    // Establish connection with bspc socket
+    if (s->bspc_socket == NULL)
+    {
+        s->bspc_socket = malloc(strlen(BSPWC_DEFAULT_SOCKET));
+        strcpy(s->bspc_socket, BSPWC_DEFAULT_SOCKET);
+    }
+    setenv("BSPWM_SOCKET", s->bspc_socket, true);
+    wlr_log(L_INFO, "Using BSPWM_SOCKET=%s", getenv("BSPWM_SOCKET"));
+
+    return true;
+}
+
+bool start_server(struct bspwc_server* s)
 {
     wlr_log(L_INFO, "Starting bspwc");
     
@@ -49,7 +55,7 @@ bool start_bspwc(struct bspwc* s)
     return true;
 }
 
-bool terminate_bspwc(struct bspwc* s)
+bool terminate_server(struct bspwc_server* s)
 {
     wlr_log(L_INFO, "Terminating bspwc");
 

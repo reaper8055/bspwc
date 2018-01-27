@@ -5,25 +5,31 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include <wayland-server.h>
-
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 
 #include "bspwc/config.h"
 #include "bspwc/bspwc.h"
 
-#define BSPWC_VERSION 0.1 // TODO: Move that elsewhere
+struct bspwc_server server;
 
-struct bspwc compositor;
+/*
+static int read_events(int fd, uint32_t mask, void* data)
+{
+    wlr_log(L_INFO, "reading events from socket %f, %f, %p", fd, mask, data);
+    return 0;
+}
+*/
 
 int main(int argc, char *argv[])
 {
     static int verbose = 0, debug = 0;
 
     char* config_file = NULL;
-    char* bspwm_socket = NULL;
 
     const char* usage = 
         "Usage: bspwc [option]\n"
@@ -60,11 +66,11 @@ int main(int argc, char *argv[])
                 strcpy(config_file, optarg);
                 break;
             case 's':
-                bspwm_socket = malloc(strlen(optarg));
-                strcpy(bspwm_socket, optarg);
+                server.bspc_socket = malloc(strlen(optarg));
+                strcpy(server.bspc_socket, optarg);
                 break;
             case 'v':
-                printf("%f\n", BSPWC_VERSION);
+                printf("%s\n", BSPWC_VERSION);
                 exit(EXIT_SUCCESS);
                 break;
             case 'V':
@@ -89,7 +95,68 @@ int main(int argc, char *argv[])
         wlr_log_init(L_ERROR, NULL);
     }
 
-    init_bspwc(&compositor);
+    if (!init_server(&server))
+    {
+		wlr_log(L_ERROR, "Failed to init server");
+        exit(EXIT_FAILURE);
+    }
+   
+    // Wayland display socket
+    const char* wl_socket = wl_display_add_socket_auto(server.display);
+	if (!wl_socket)
+    {
+		wlr_log(L_ERROR, "Unable to open wayland socket");
+        terminate_server(&server);
+        exit(EXIT_FAILURE);
+    }
+    setenv("WAYLAND_DISPLAY", wl_socket, true);
+    wlr_log(L_INFO, "Running bspwc on wayland display '%s'", getenv("WAYLAND_DISPLAY"));
+
+    if (!setup_bspwc(&server))
+    {
+		wlr_log(L_ERROR, "Unable to setup bspwc");
+        terminate_server(&server);
+        exit(EXIT_FAILURE);
+    }
+
+/*
+    // Open socket
+    unlink(bspc_socket);
+    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd == -1)
+    {
+        wlr_log(L_ERROR, "Error creating local socket");
+        exit(EXIT_FAILURE);
+    }
+
+    struct sockaddr_un sock;
+    memset(&sock, 0, sizeof(struct sockaddr_un));
+    sock.sun_family = AF_UNIX;
+    strncpy(sock.sun_path, bspc_socket, sizeof(sock.sun_path) - 1);
+
+    int ret = bind(fd, (const struct sockaddr*) &sock, sizeof(struct sockaddr_un));
+    if (ret == -1)
+    {
+        wlr_log(L_ERROR, "Error binding socket");
+        exit(EXIT_FAILURE);
+    }
+    // Register fd to wl_event_loops
+    struct wl_event_source* input_event;
+    input_event = wl_event_loop_add_fd(server.event_loop, fd, WL_EVENT_READABLE, read_events, server.backend);
+    if (!input_event)
+    {
+		wlr_log(L_ERROR, "Failed to create input event on event loop");
+		exit(EXIT_FAILURE);
+    }
+*/
+
+    // Start BSPWC
+    if (!start_server(&server))
+    {
+        wlr_log(L_ERROR, "Failed to start server");
+        terminate_server(&server);
+        exit(EXIT_FAILURE);
+    }
 
     // If no config_file is given, the default one is
     // $HOME/.config/bspwc/bspwcrc
@@ -101,45 +168,25 @@ int main(int argc, char *argv[])
             wlr_log(L_ERROR, "Failed to get HOME environment variable");
         }
         
-        const char* cfg_file = ".config/bspwc/bspwcrc";
-        
-        config_file = malloc(strlen(home_dir) + strlen(cfg_file));
+        config_file = malloc(strlen(home_dir) + strlen(BSPWC_DEFAUT_CONFIG_FILE));
         config_file[0] = '\0';
 
         strcat(config_file, home_dir);
-        strcat(config_file, cfg_file);
+        strcat(config_file, BSPWC_DEFAUT_CONFIG_FILE);
     }
 
     if (!load_config_file(config_file))
     {
 		wlr_log(L_ERROR, "Failed to load config file");
-        terminate_bspwc(&compositor);
-        return 1;
+        terminate_server(&server);
+        exit(EXIT_FAILURE);
     }
-
-    free(config_file);
     
-    const char* wl_socket = wl_display_add_socket_auto(compositor.display);
-	if (!wl_socket)
-    {
-		wlr_log(L_ERROR, "Unable to open wayland socket");
-        terminate_bspwc(&compositor);
-		return 1;
-    }
+    wl_display_run(server.display);
 
-    wlr_log(L_INFO, "Running bspwc on wayland display '%s'", wl_socket);
-    setenv("WAYLAND_DISPLAY", wl_socket, true);
-
-    if (!start_bspwc(&compositor))
-    {
-        wlr_log(L_ERROR, "Failed to start compositor");
-        terminate_bspwc(&compositor);
-        return 1;
-    }
-
-    wl_display_run(compositor.display);
-
-    terminate_bspwc(&compositor);
+    terminate_server(&server);
+    
+    free(config_file);
 
     return 0;
 }
