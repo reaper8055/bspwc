@@ -11,6 +11,8 @@ project(
 	],
 )
 
+add_project_arguments('-Wno-unused-parameter', language: 'c')
+
 inc_folder = include_directories('include')
 
 cc = meson.get_compiler('c')

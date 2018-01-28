@@ -15,21 +15,47 @@
 #include "bspwc/config.h"
 #include "bspwc/bspwc.h"
 
-struct bspwc_server server;
+#define BSPWC_DEFAULT_SOCKET "/tmp/bspwc_socket"
 
-/*
 static int read_events(int fd, uint32_t mask, void* data)
 {
-    wlr_log(L_INFO, "reading events from socket %f, %f, %p", fd, mask, data);
-    return 0;
+    const size_t BUFFER_SIZE = 128u; // TODO: too much or too little?
+    int ret = 0;
+
+    // Get a pointer to the server
+    struct bspwc_server* s = data;
+
+    int data_socket = accept(s->socket, NULL, NULL);
+    if (data_socket == -1)
+    {
+        wlr_log(L_ERROR, "Failed to accept on socket %s", s->socket_name);
+        return 1;
+    }
+
+    char buffer[BUFFER_SIZE];
+
+    // TODO: Is it blocking?
+    ret = read(data_socket, buffer, BUFFER_SIZE);
+    if (ret == -1)
+    {
+        wlr_log(L_ERROR, "Failed to read on socket %s", s->socket_name);
+        return 1;
+    }
+    buffer[BUFFER_SIZE - 1] = 0;
+
+    wlr_log(L_INFO, "%s", buffer);
+
+    return ret;
 }
-*/
 
 int main(int argc, char *argv[])
 {
+    struct bspwc_server server = {0};
+
     static int verbose = 0, debug = 0;
 
     char* config_file = NULL;
+    char* socket_name = NULL;
 
     const char* usage = 
         "Usage: bspwc [option]\n"
@@ -66,8 +92,8 @@ int main(int argc, char *argv[])
                 strcpy(config_file, optarg);
                 break;
             case 's':
-                server.bspc_socket = malloc(strlen(optarg));
-                strcpy(server.bspc_socket, optarg);
+                server.socket_name = malloc(strlen(optarg));
+                strcpy(server.socket_name, optarg);
                 break;
             case 'v':
                 printf("%s\n", BSPWC_VERSION);
@@ -112,6 +138,13 @@ int main(int argc, char *argv[])
     setenv("WAYLAND_DISPLAY", wl_socket, true);
     wlr_log(L_INFO, "Running bspwc on wayland display '%s'", getenv("WAYLAND_DISPLAY"));
 
+    // Setup BSPWM related stuff
+    if (server.socket_name == NULL)
+    {
+        server.socket_name = malloc(strlen(BSPWC_DEFAULT_SOCKET));
+        strcpy(server.socket_name, BSPWC_DEFAULT_SOCKET);
+    }
+
     if (!setup_bspwc(&server))
     {
 		wlr_log(L_ERROR, "Unable to setup bspwc");
@@ -119,36 +152,13 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-/*
-    // Open socket
-    unlink(bspc_socket);
-    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (fd == -1)
-    {
-        wlr_log(L_ERROR, "Error creating local socket");
-        exit(EXIT_FAILURE);
-    }
-
-    struct sockaddr_un sock;
-    memset(&sock, 0, sizeof(struct sockaddr_un));
-    sock.sun_family = AF_UNIX;
-    strncpy(sock.sun_path, bspc_socket, sizeof(sock.sun_path) - 1);
-
-    int ret = bind(fd, (const struct sockaddr*) &sock, sizeof(struct sockaddr_un));
-    if (ret == -1)
-    {
-        wlr_log(L_ERROR, "Error binding socket");
-        exit(EXIT_FAILURE);
-    }
-    // Register fd to wl_event_loops
-    struct wl_event_source* input_event;
-    input_event = wl_event_loop_add_fd(server.event_loop, fd, WL_EVENT_READABLE, read_events, server.backend);
-    if (!input_event)
+    server.input_event = wl_event_loop_add_fd(
+            server.event_loop, server.socket, WL_EVENT_READABLE, read_events, &server);
+    if (!server.input_event)
     {
 		wlr_log(L_ERROR, "Failed to create input event on event loop");
 		exit(EXIT_FAILURE);
     }
-*/
 
     // Start BSPWC
     if (!start_server(&server))
@@ -184,9 +194,13 @@ int main(int argc, char *argv[])
     
     wl_display_run(server.display);
 
+    // Stop receiving from bspc
+    wl_event_source_remove(server.input_event);
+
     terminate_server(&server);
     
     free(config_file);
+    free(socket_name);
 
     return 0;
 }

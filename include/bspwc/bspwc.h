@@ -7,6 +7,9 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 #include <wayland-server.h>
 #include <wlr/backend.h>
@@ -23,11 +26,13 @@ struct bspwc_server
 
 	struct wl_display* display;
 	struct wl_event_loop* event_loop;
+    struct wl_event_source* input_event;
 
 	struct wlr_backend* backend;
     struct wlr_renderer* renderer;
 
-    char* bspc_socket;
+    int socket;
+    char* socket_name;
 };
 
 bool init_server(struct bspwc_server* s);

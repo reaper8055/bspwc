@@ -30,14 +30,36 @@ bool init_server(struct bspwc_server* s)
 
 bool setup_bspwc(struct bspwc_server* s)
 {
-    // Establish connection with bspc socket
-    if (s->bspc_socket == NULL)
+
+    struct sockaddr_un sock;
+    memset(&sock, 0, sizeof(struct sockaddr_un));
+
+    sock.sun_family = AF_UNIX;
+    strncpy(sock.sun_path, s->socket_name, sizeof(sock.sun_path) - 1);
+
+    if ((s->socket = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
     {
-        s->bspc_socket = malloc(strlen(BSPWC_DEFAULT_SOCKET));
-        strcpy(s->bspc_socket, BSPWC_DEFAULT_SOCKET);
+        wlr_log(L_ERROR, "Failed to create socket %s", s->socket_name);
+        return false;
     }
-    setenv("BSPWM_SOCKET", s->bspc_socket, true);
-    wlr_log(L_INFO, "Using BSPWM_SOCKET=%s", getenv("BSPWM_SOCKET"));
+
+    unlink(s->socket_name);
+    
+    int ret = bind(s->socket, (const struct sockaddr *) &sock, sizeof(struct sockaddr_un));
+    if (ret == -1)
+    {
+        wlr_log(L_ERROR, "Failed to bind to socket %s", s->socket_name);
+        return false;
+    }
+
+    ret = listen(s->socket, SOMAXCONN);
+    if (ret == -1)
+    {
+        wlr_log(L_ERROR, "Failed to listen on socket %s", s->socket_name);
+        return false;
+    }
+
+    wlr_log(L_INFO, "BSPWM socket setup to %s", s->socket_name);
 
     return true;
 }
