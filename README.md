@@ -13,3 +13,7 @@ Run these commands:
 
     meson build
     ninja -C build
+
+### TODO list
+
+https://todo.sr.ht/%7Ebl4ckb0ne/bspwc
