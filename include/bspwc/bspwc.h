@@ -15,22 +15,29 @@
 #include <wlr/backend.h>
 #include <wlr/render.h>
 #include <wlr/render/gles2.h>
+#include <wlr/xwayland.h>
+#include <wlr/types/wlr_compositor.h>
 #include <wlr/types/wlr_data_device.h>
+#include <wlr/types/wlr_xcursor_manager.h>
 #include <wlr/util/log.h>
 
 #include "bspwc/common.h"
 
 struct bspwc_server
 {
-    struct wlr_data_device_manager* data_device_manager;
 
 	struct wl_display* display;
-	struct wl_event_loop* event_loop;
-    struct wl_event_source* input_event;
-
 	struct wlr_backend* backend;
     struct wlr_renderer* renderer;
+	
+    struct wlr_data_device_manager* data_device_manager;
+    struct wl_event_loop* event_loop;
+    struct wl_event_source* input_event;
+    struct wlr_compositor* compositor;
+    struct wlr_xwayland* xwayland;
+    struct wlr_xcursor_manager* xcursor_manager;
 
+    // BSPWM related stuff
     int socket;
     char* socket_name;
 };

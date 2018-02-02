@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200112L
 
 #include <getopt.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,10 +13,14 @@
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 
+#include "bspwc/desktop.h"
 #include "bspwc/config.h"
 #include "bspwc/bspwc.h"
 
 #define BSPWC_DEFAULT_SOCKET "/tmp/bspwc_socket"
+
+// TODO: goes in main() if I can find a way to give it to sig_handler()
+struct bspwc_server server = {0};
 
 static int read_events(int fd, uint32_t mask, void* data)
 {
@@ -48,10 +53,29 @@ static int read_events(int fd, uint32_t mask, void* data)
     return ret;
 }
 
+void sig_handler(int sig)
+{
+    const char *signal;
+
+    switch (sig)
+    {
+        case SIGINT:
+            signal = "SIGINT";
+            break;
+        case SIGTERM:
+            signal = "SIGTERM";
+            break;
+        default:
+            signal = "TODO";
+            break;
+    }
+
+    wlr_log(L_INFO, "%s caugh, terminating display", signal);
+	wl_display_terminate(server.display);
+}
+
 int main(int argc, char *argv[])
 {
-    struct bspwc_server server = {0};
-
     static int verbose = 0, debug = 0;
 
     char* config_file = NULL;
@@ -185,13 +209,24 @@ int main(int argc, char *argv[])
         strcat(config_file, BSPWC_DEFAUT_CONFIG_FILE);
     }
 
+    // Create example desktop
+    struct desktop* d = desktop_create(&server);
+    if (d == NULL)
+    {
+        wlr_log(L_ERROR, "Failed to create desktop");
+        terminate_server(&server);
+        exit(EXIT_FAILURE);
+    }
+/*
     if (!load_config_file(config_file))
     {
 		wlr_log(L_ERROR, "Failed to load config file");
         terminate_server(&server);
         exit(EXIT_FAILURE);
     }
-    
+*/
+    signal(SIGINT, sig_handler);
+
     wl_display_run(server.display);
 
     // Stop receiving from bspc

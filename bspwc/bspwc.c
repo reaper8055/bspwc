@@ -5,7 +5,11 @@ bool init_server(struct bspwc_server* s)
     wlr_log(L_INFO, "Initializing bspwc");
 
     s->display = wl_display_create();
+
+    wl_display_init_shm(s->display);
+
    	s->event_loop = wl_display_get_event_loop(s->display);
+    s->data_device_manager = wlr_data_device_manager_create(s->display);
 
 	s->backend = wlr_backend_autocreate(s->display);
     if (s->backend == NULL)
@@ -21,9 +25,17 @@ bool init_server(struct bspwc_server* s)
         return false;
     }
 
-    s->data_device_manager = wlr_data_device_manager_create(s->display);
+	s->compositor = wlr_compositor_create(s->display, s->renderer);
+    s->xwayland = wlr_xwayland_create(s->display, s->compositor);
 
-    wl_display_init_shm(s->display);
+	const char *cursor_default = "left_ptr";
+	s->xcursor_manager = wlr_xcursor_manager_create(cursor_default, 24);
+	if (s->xcursor_manager == NULL)
+    {
+		wlr_log(L_ERROR, "Cannot create XCursor manager for theme %s", cursor_default);
+		return false;
+    }
+
 
     return true;
 }
@@ -80,6 +92,8 @@ bool start_server(struct bspwc_server* s)
 bool terminate_server(struct bspwc_server* s)
 {
     wlr_log(L_INFO, "Terminating bspwc");
+
+    wlr_xcursor_manager_destroy(s->xcursor_manager);
 
     wlr_backend_destroy(s->backend);
     wl_display_destroy(s->display);
