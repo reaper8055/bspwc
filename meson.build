@@ -13,6 +13,10 @@ project(
 
 add_project_arguments('-Wno-unused-parameter', language: 'c')
 
+if (get_option('buildtype') == 'release')
+  add_project_arguments('-D_FORTIFY_SOURCE=2', language: 'c')
+endif
+
 inc_folder = include_directories('include')
 
 cc = meson.get_compiler('c')
