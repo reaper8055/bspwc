@@ -2,7 +2,7 @@ bspwc_src = files(
     'main.c',
     'config.c',
     'desktop.c',
-    'bspwc.c',
+    'server.c',
 )
 
 bspwc_deps = [

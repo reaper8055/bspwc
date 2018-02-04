@@ -1,6 +1,6 @@
-#include "bspwc/bspwc.h"
+#include "bspwc/server.h"
 
-bool init_server(struct bspwc_server* s)
+bool init_server(struct server* s)
 {
     wlr_log(L_INFO, "Initializing bspwc");
 
@@ -40,7 +40,7 @@ bool init_server(struct bspwc_server* s)
     return true;
 }
 
-bool setup_bspwc(struct bspwc_server* s)
+bool setup_bspwc(struct server* s)
 {
 
     struct sockaddr_un sock;
@@ -76,7 +76,7 @@ bool setup_bspwc(struct bspwc_server* s)
     return true;
 }
 
-bool start_server(struct bspwc_server* s)
+bool start_server(struct server* s)
 {
     wlr_log(L_INFO, "Starting bspwc");
     
@@ -89,7 +89,7 @@ bool start_server(struct bspwc_server* s)
     return true;
 }
 
-bool terminate_server(struct bspwc_server* s)
+bool terminate_server(struct server* s)
 {
     wlr_log(L_INFO, "Terminating bspwc");
 

@@ -23,7 +23,7 @@
 
 #include "bspwc/common.h"
 
-struct bspwc_server
+struct server
 {
 
 	struct wl_display* display;
@@ -42,9 +42,9 @@ struct bspwc_server
     char* socket_name;
 };
 
-bool init_server(struct bspwc_server* s);
-bool setup_bspwc(struct bspwc_server* s);
-bool start_server(struct bspwc_server* s);
-bool terminate_server(struct bspwc_server* s);
+bool init_server(struct server* s);
+bool setup_bspwc(struct server* s);
+bool start_server(struct server* s);
+bool terminate_server(struct server* s);
 
 #endif // BSPWC_H

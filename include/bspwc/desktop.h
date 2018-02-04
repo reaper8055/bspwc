@@ -7,7 +7,7 @@
 #include <wlr/types/wlr_wl_shell.h>
 #include <wlr/types/wlr_xdg_shell_v6.h>
 
-#include "bspwc/bspwc.h"
+#include "bspwc/server.h"
 
 struct padding
 {
@@ -50,6 +50,6 @@ void handle_wl_shell_surface(struct wl_listener* listener, void* data);
 void handle_xwayland_surface(struct wl_listener* listener, void* data);
 void handle_layout_change(struct wl_listener* listener, void* data);
 
-struct desktop* desktop_create(struct bspwc_server* s);
+struct desktop* desktop_create(struct server* s);
 
 #endif // DESKTOP_H

@@ -18,7 +18,7 @@ void handle_xwayland_surface(struct wl_listener* listener, void* data)
 void handle_layout_change(struct wl_listener* listener, void* data)
 {}
 
-struct desktop* desktop_create(struct bspwc_server* s)
+struct desktop* desktop_create(struct server* s)
 {
     wlr_log(L_DEBUG, "Initializing desktop");
 
