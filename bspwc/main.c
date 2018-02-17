@@ -13,7 +13,6 @@
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 
-#include "bspwc/desktop.h"
 #include "bspwc/config.h"
 #include "bspwc/server.h"
 
@@ -209,14 +208,16 @@ int main(int argc, char *argv[])
         strcat(config_file, BSPWC_DEFAUT_CONFIG_FILE);
     }
 
+/*
     // Create example desktop
-    struct desktop* d = desktop_create(&bspwc);
-    if (d == NULL)
+    struct monitor* m = monitor_create(&bspwc);
+    if (m == NULL)
     {
-        wlr_log(L_ERROR, "Failed to create desktop");
+        wlr_log(L_ERROR, "Failed to create monitor");
         terminate_server(&bspwc);
         exit(EXIT_FAILURE);
     }
+*/
 /*
     if (!load_config_file(config_file))
     {
