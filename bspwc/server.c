@@ -26,9 +26,8 @@ bool init_server(struct server* s)
     }
 
 	s->compositor = wlr_compositor_create(s->display, s->renderer);
-    s->xwayland = wlr_xwayland_create(s->display, s->compositor);
 
-	const char *cursor_default = "left_ptr";
+	const char* cursor_default = "left_ptr";
 	s->xcursor_manager = wlr_xcursor_manager_create(cursor_default, 24);
 	if (s->xcursor_manager == NULL)
     {
@@ -36,6 +35,37 @@ bool init_server(struct server* s)
 		return false;
     }
 
+    struct wlr_xcursor* xcursor = wlr_xcursor_manager_get_xcursor(s->xcursor_manager, cursor_default, 1);
+    if (xcursor == NULL)
+    {
+        wlr_log(L_ERROR, "Cannot get xcursor from manager");
+        return false;
+    }
+
+    s->xwayland = wlr_xwayland_create(s->display, s->compositor);
+    wl_signal_add(&s->xwayland->events.new_surface, &s->xwayland_surface);
+    s->xwayland_surface.notify = handle_xwayland_surface;
+
+    struct wlr_xcursor_image *image = xcursor->images[0];
+    wlr_xwayland_set_cursor(
+            s->xwayland,
+            image->buffer,
+            image->width,
+            image->width,
+            image->height,
+            image->hotspot_x, 
+            image->hotspot_y
+        );
+
+    s->gamma_control_manager = wlr_gamma_control_manager_create(s->display);
+    s->screenshooter = wlr_screenshooter_create(s->display);
+    s->server_decoration_manager = wlr_server_decoration_manager_create(s->display);
+    wlr_server_decoration_manager_set_default_mode(
+            s->server_decoration_manager,
+            WLR_SERVER_DECORATION_MANAGER_MODE_CLIENT
+        );
+    s->primary_selection_device_manager = wlr_primary_selection_device_manager_create(s->display);
+    s->idle = wlr_idle_create(s->display);
 
     return true;
 }
