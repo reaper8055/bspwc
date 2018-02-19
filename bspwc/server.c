@@ -27,6 +27,14 @@ bool init_server(struct server* s)
 
 	s->compositor = wlr_compositor_create(s->display, s->renderer);
 
+    // Maybe make that configurable? Is everybody OK with the default pointer?
+    s->xcursor_theme = wlr_xcursor_theme_load("default", 16);
+    if (!s->xcursor_theme)
+    {
+		wlr_log(L_ERROR, "Failed to load cursor theme");
+		return 1;
+    }
+
 	const char* cursor_default = "left_ptr";
 	s->xcursor_manager = wlr_xcursor_manager_create(cursor_default, 24);
 	if (s->xcursor_manager == NULL)
@@ -35,7 +43,7 @@ bool init_server(struct server* s)
 		return false;
     }
 
-    struct wlr_xcursor* xcursor = wlr_xcursor_manager_get_xcursor(s->xcursor_manager, cursor_default, 1);
+    struct wlr_xcursor* xcursor = wlr_xcursor_theme_get_cursor(s->xcursor_theme, cursor_default);
     if (xcursor == NULL)
     {
         wlr_log(L_ERROR, "Cannot get xcursor from manager");
