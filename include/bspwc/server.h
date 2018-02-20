@@ -40,6 +40,7 @@ struct server
     struct wl_event_loop* event_loop;
     struct wl_event_source* input_event;
     struct wlr_compositor* compositor;
+    struct wlr_cursor* cursor;
     struct wlr_xcursor_theme* xcursor_theme;
     struct wlr_xcursor_manager* xcursor_manager;
     struct wlr_xwayland* xwayland;

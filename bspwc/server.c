@@ -54,7 +54,7 @@ bool init_server(struct server* s)
     wl_signal_add(&s->xwayland->events.new_surface, &s->xwayland_surface);
     s->xwayland_surface.notify = handle_xwayland_surface;
 
-    struct wlr_xcursor_image *image = xcursor->images[0];
+    struct wlr_xcursor_image* image = xcursor->images[0];
     wlr_xwayland_set_cursor(
             s->xwayland,
             image->buffer,
@@ -63,6 +63,18 @@ bool init_server(struct server* s)
             image->height,
             image->hotspot_x, 
             image->hotspot_y
+        );
+
+    s->cursor = wlr_cursor_create();
+    wlr_cursor_set_image(
+            s->cursor,
+            image->buffer,
+            image->width,
+            image->width,
+            image->height,
+            image->hotspot_x,
+            image->hotspot_y,
+            0
         );
 
     s->gamma_control_manager = wlr_gamma_control_manager_create(s->display);
@@ -132,6 +144,8 @@ bool terminate_server(struct server* s)
     wlr_log(L_INFO, "Terminating bspwc");
 
     wlr_xcursor_manager_destroy(s->xcursor_manager);
+    wlr_xcursor_theme_destroy(s->xcursor_theme);
+    wlr_cursor_destroy(s->cursor);
 
     wlr_backend_destroy(s->backend);
     wl_display_destroy(s->display);
