@@ -27,6 +27,10 @@ bool init_server(struct server* s)
 
 	s->compositor = wlr_compositor_create(s->display, s->renderer);
 
+    wl_list_init(&s->monitors);
+    s->new_monitor.notify = new_monitor_notify;
+    wl_signal_add(&s->backend->events.new_output, &s->new_monitor);
+
     // Maybe make that configurable? Is everybody OK with the default pointer?
     s->xcursor_theme = wlr_xcursor_theme_load("default", 16);
     if (!s->xcursor_theme)

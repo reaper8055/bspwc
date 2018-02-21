@@ -28,23 +28,27 @@
 
 #include "bspwc/common.h"
 #include "bspwc/handles.h"
+#include "bspwc/monitor.h"
 
 struct server
 {
-
 	struct wl_display* display;
 	struct wlr_backend* backend;
     struct wlr_renderer* renderer;
-	
+    
+    struct wl_listener new_monitor;
+    struct wl_list monitors;
+    
+    struct wlr_xcursor_theme* xcursor_theme;
+    struct wlr_xcursor_manager* xcursor_manager;
+    struct wlr_xwayland* xwayland;
+    struct wl_listener xwayland_surface;
+
     struct wlr_data_device_manager* data_device_manager;
     struct wl_event_loop* event_loop;
     struct wl_event_source* input_event;
     struct wlr_compositor* compositor;
     struct wlr_cursor* cursor;
-    struct wlr_xcursor_theme* xcursor_theme;
-    struct wlr_xcursor_manager* xcursor_manager;
-    struct wlr_xwayland* xwayland;
-    struct wl_listener xwayland_surface;
     struct wlr_gamma_control_manager* gamma_control_manager;
     struct wlr_screenshooter* screenshooter;
     struct wlr_server_decoration_manager* server_decoration_manager;

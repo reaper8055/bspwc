@@ -210,22 +210,6 @@ int main(int argc, char *argv[])
         strcat(config_file, BSPWC_DEFAUT_CONFIG_FILE);
     }
 
-    // Create example desktop
-    struct monitor* m = monitor_create(&bspwc, "monitor_1");
-    if (m == NULL)
-    {
-        wlr_log(L_ERROR, "Failed to create monitor");
-        terminate_server(&bspwc);
-        exit(EXIT_FAILURE);
-    }
-
-    struct desktop* d = desktop_create(&bspwc, "I");
-    if (d == NULL)
-    {
-        wlr_log(L_ERROR, "Failed to create desktop");
-        terminate_server(&bspwc);
-        exit(EXIT_FAILURE);
-    }
 /*
     if (!load_config_file(config_file))
     {
