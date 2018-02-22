@@ -18,6 +18,8 @@ void new_monitor_notify(struct wl_listener* listener, void* data)
     m->server = server;
     m->wlr_output = wlr_output;
     m->color[0] = 1.0;
+    m->color[1] = 1.0;
+    m->color[2] = 1.0;
     m->color[3] = 1.0;
     wl_list_insert(&server->monitors, &m->server_link);
 
@@ -43,15 +45,13 @@ void monitor_frame_notify(struct wl_listener* listener, void* data)
 {
     struct monitor* monitor = wl_container_of(listener, monitor, frame);
     struct wlr_output* wlr_output = data;
-    
-    wlr_log(L_DEBUG, "Frame monitor %s", wlr_output->name);
    
     struct wlr_renderer* renderer = wlr_backend_get_renderer(wlr_output->backend);
 
     wlr_output_make_current(wlr_output, NULL);
     wlr_renderer_begin(renderer, wlr_output);
 
-    wlr_renderer_clear(renderer, &(float[]){0.25f, 0.25f, 0.25f, 1});
+    wlr_renderer_clear(renderer, &monitor->color);
 
     wlr_output_swap_buffers(wlr_output, NULL, NULL);
     wlr_renderer_end(renderer);

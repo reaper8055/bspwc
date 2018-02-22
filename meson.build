@@ -6,12 +6,13 @@ project(
 	meson_version: '>=0.43.0',
 	default_options: [
 		'c_std=c11',
-		'warning_level=3',
+		'warning_level=2',
 		'werror=true',
+        'buildtype=debug',
 	],
 )
 
-add_project_arguments('-Wno-unused-parameter', language: 'c')
+add_project_arguments('-Wno-unused-parameter', '-Wextra', language: 'c')
 
 if (get_option('buildtype') == 'release')
   add_project_arguments('-D_FORTIFY_SOURCE=2', language: 'c')
