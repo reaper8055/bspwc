@@ -5,11 +5,7 @@ bool init_server(struct server* s)
     wlr_log(L_INFO, "Initializing bspwc");
 
     s->display = wl_display_create();
-
-    wl_display_init_shm(s->display);
-
    	s->event_loop = wl_display_get_event_loop(s->display);
-    s->data_device_manager = wlr_data_device_manager_create(s->display);
 
 	s->backend = wlr_backend_autocreate(s->display);
     if (s->backend == NULL)
@@ -24,8 +20,18 @@ bool init_server(struct server* s)
         wlr_log(L_ERROR, "Could not create gles2 renderer");
         return false;
     }
+    
+    wl_display_init_shm(s->display);
+    wlr_gamma_control_manager_create(s->display);
+    wlr_screenshooter_create(s->display);
+    wlr_primary_selection_device_manager_create(s->display);
+    wlr_idle_create(s->display);
+	
+    wlr_data_device_manager_create(s->display);
+    s->compositor = wlr_compositor_create(s->display, s->renderer);
 
-	s->compositor = wlr_compositor_create(s->display, s->renderer);
+    struct wlr_server_decoration_manager* sdm = wlr_server_decoration_manager_create(s->display);
+    wlr_server_decoration_manager_set_default_mode(sdm, WLR_SERVER_DECORATION_MANAGER_MODE_CLIENT);
 
     wl_list_init(&s->monitors);
     s->new_monitor.notify = new_monitor_notify;
@@ -81,15 +87,6 @@ bool init_server(struct server* s)
             0
         );
 
-    s->gamma_control_manager = wlr_gamma_control_manager_create(s->display);
-    s->screenshooter = wlr_screenshooter_create(s->display);
-    s->server_decoration_manager = wlr_server_decoration_manager_create(s->display);
-    wlr_server_decoration_manager_set_default_mode(
-            s->server_decoration_manager,
-            WLR_SERVER_DECORATION_MANAGER_MODE_CLIENT
-        );
-    s->primary_selection_device_manager = wlr_primary_selection_device_manager_create(s->display);
-    s->idle = wlr_idle_create(s->display);
 
     return true;
 }
@@ -134,11 +131,23 @@ bool start_server(struct server* s)
 {
     wlr_log(L_INFO, "Starting bspwc");
     
+    // Wayland display socket
+    const char* wl_socket = wl_display_add_socket_auto(s->display);
+	if (!wl_socket)
+    {
+		wlr_log(L_ERROR, "Unable to open wayland socket");
+        terminate_server(s);
+        exit(EXIT_FAILURE);
+    }
+    
     if (!wlr_backend_start(s->backend))
     {
         wlr_log(L_ERROR, "Failed to start bspwc backend");
         return false;
     }
+    
+    setenv("WAYLAND_DISPLAY", wl_socket, true);
+    wlr_log(L_INFO, "Running bspwc on wayland display '%s'", getenv("WAYLAND_DISPLAY"));
 
     return true;
 }

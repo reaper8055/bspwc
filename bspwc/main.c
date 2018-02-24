@@ -152,17 +152,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
    
-    // Wayland display socket
-    const char* wl_socket = wl_display_add_socket_auto(bspwc.display);
-	if (!wl_socket)
-    {
-		wlr_log(L_ERROR, "Unable to open wayland socket");
-        terminate_server(&bspwc);
-        exit(EXIT_FAILURE);
-    }
-    setenv("WAYLAND_DISPLAY", wl_socket, true);
-    wlr_log(L_INFO, "Running bspwc on wayland display '%s'", getenv("WAYLAND_DISPLAY"));
-
     // Setup BSPWM related stuff
     if (bspwc.socket_name == NULL)
     {
@@ -192,7 +181,7 @@ int main(int argc, char *argv[])
         terminate_server(&bspwc);
         exit(EXIT_FAILURE);
     }
-
+    
     // If no config_file is given, the default one is
     // $HOME/.config/bspwc/bspwcrc
     if (config_file == NULL)
