@@ -38,11 +38,23 @@ struct server
     
     struct wl_listener new_monitor;
     struct wl_list monitors;
+
+    struct wlr_output_layout* layout;
+    struct wl_listener layout_change;
+
+    struct wlr_xdg_shell_v6* xdg_shell_v6;
+    struct wl_listener xdg_shell_v6_surface;
+    
+    struct wlr_wl_shell* wl_shell;
+    struct wl_listener wl_shell_surface;
+    
+    struct wlr_xwayland* xwayland;
+    struct wl_listener xwayland_surface;
     
     struct wlr_xcursor_theme* xcursor_theme;
     struct wlr_xcursor_manager* xcursor_manager;
-    struct wlr_xwayland* xwayland;
-    struct wl_listener xwayland_surface;
+
+    struct wl_listener decoration_new;
 
     struct wl_event_loop* event_loop;
     struct wl_event_source* input_event;

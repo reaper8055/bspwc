@@ -20,18 +20,6 @@ bool init_server(struct server* s)
         wlr_log(L_ERROR, "Could not create gles2 renderer");
         return false;
     }
-    
-    wl_display_init_shm(s->display);
-    wlr_gamma_control_manager_create(s->display);
-    wlr_screenshooter_create(s->display);
-    wlr_primary_selection_device_manager_create(s->display);
-    wlr_idle_create(s->display);
-	
-    wlr_data_device_manager_create(s->display);
-    s->compositor = wlr_compositor_create(s->display, s->renderer);
-
-    struct wlr_server_decoration_manager* sdm = wlr_server_decoration_manager_create(s->display);
-    wlr_server_decoration_manager_set_default_mode(sdm, WLR_SERVER_DECORATION_MANAGER_MODE_CLIENT);
 
     wl_list_init(&s->monitors);
     s->new_monitor.notify = new_monitor_notify;
@@ -59,6 +47,20 @@ bool init_server(struct server* s)
         wlr_log(L_ERROR, "Cannot get xcursor from manager");
         return false;
     }
+    
+    // Layout arranges monitors relative to each other in physical space
+    // using global coordinates systems to do operations on boxes
+    s->layout = wlr_output_layout_create();
+    s->layout_change.notify = handle_layout_change;
+    wl_signal_add(&s->layout->events.change, &s->layout_change);
+
+    s->xdg_shell_v6 = wlr_xdg_shell_v6_create(s->display);
+    wl_signal_add(&s->xdg_shell_v6->events.new_surface, &s->xdg_shell_v6_surface);
+    s->xdg_shell_v6_surface.notify = handle_xdg_shell_v6_surface;
+    
+    s->wl_shell = wlr_wl_shell_create(s->display);
+    wl_signal_add(&s->wl_shell->events.new_surface, &s->wl_shell_surface);
+    s->wl_shell_surface.notify = handle_wl_shell_surface;
 
     s->xwayland = wlr_xwayland_create(s->display, s->compositor);
     wl_signal_add(&s->xwayland->events.new_surface, &s->xwayland_surface);
@@ -86,6 +88,18 @@ bool init_server(struct server* s)
             image->hotspot_y,
             0
         );
+    
+    wl_display_init_shm(s->display);
+    wlr_gamma_control_manager_create(s->display);
+    wlr_screenshooter_create(s->display);
+    wlr_primary_selection_device_manager_create(s->display);
+    wlr_idle_create(s->display);
+	
+    wlr_data_device_manager_create(s->display);
+    s->compositor = wlr_compositor_create(s->display, s->renderer);
+
+    struct wlr_server_decoration_manager* sdm = wlr_server_decoration_manager_create(s->display);
+    wlr_server_decoration_manager_set_default_mode(sdm, WLR_SERVER_DECORATION_MANAGER_MODE_CLIENT);
 
 
     return true;

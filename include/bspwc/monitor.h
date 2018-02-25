@@ -14,14 +14,17 @@
 #include <wlr/render.h>
 #include <wlr/util/log.h>
 
+#include "bspwc/desktop.h"
 #include "bspwc/server.h"
 
 struct monitor
 {
     struct server* server;
+
+    float color[4];
+    
     struct wlr_output* wlr_output;
     struct wl_list desktops;
-    float color[4];
     struct timespec last_frame;
 
     struct wl_listener destroy;
