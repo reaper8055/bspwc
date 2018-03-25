@@ -2,10 +2,7 @@ bspwc_src = files(
     'main.c',
     'config.c',
     'server.c',
-    'monitor.c',
-    'desktop.c',
-    'window.c',
-    'handles.c',
+    'output.c'
 )
 
 bspwc_deps = [
@@ -19,5 +16,5 @@ executable(
     bspwc_src,
     include_directories: [inc_folder],
     dependencies: bspwc_deps,
-    install: true 
+    install: true
 )

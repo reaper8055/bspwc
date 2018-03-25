@@ -13,15 +13,13 @@
 #include <wlr/backend.h>
 #include <wlr/util/log.h>
 
-#include "bspwc/desktop.h"
 #include "bspwc/config.h"
-#include "bspwc/monitor.h"
 #include "bspwc/server.h"
 
 #define BSPWC_DEFAULT_SOCKET "/tmp/bspwc_socket"
 
 // TODO: goes in main() if I can find a way to give it to sig_handler()
-struct server bspwc = {0};
+struct server server = {0};
 
 static int read_events(int fd, uint32_t mask, void* data)
 {
@@ -72,7 +70,7 @@ void sig_handler(int sig)
     }
 
     wlr_log(L_INFO, "%s caugh, terminating display", signal);
-	wl_display_terminate(bspwc.display);
+	wl_display_terminate(server.wl_display);
 }
 
 int main(int argc, char *argv[])
@@ -117,8 +115,8 @@ int main(int argc, char *argv[])
                 strcpy(config_file, optarg);
                 break;
             case 's':
-                bspwc.socket_name = malloc(strlen(optarg) + 1);
-                strcpy(bspwc.socket_name, optarg);
+                server.socket_name = malloc(strlen(optarg) + 1);
+                strcpy(server.socket_name, optarg);
                 break;
             case 'v':
                 printf("%s\n", BSPWC_VERSION);
@@ -146,39 +144,44 @@ int main(int argc, char *argv[])
         wlr_log_init(L_ERROR, NULL);
     }
 
-    if (!init_server(&bspwc))
+    if (!init_server(&server))
     {
 		wlr_log(L_ERROR, "Failed to init server");
         exit(EXIT_FAILURE);
     }
    
     // Setup BSPWM related stuff
-    if (bspwc.socket_name == NULL)
+    if (server.socket_name == NULL)
     {
-        bspwc.socket_name = malloc(strlen(BSPWC_DEFAULT_SOCKET) + 1);
-        strcpy(bspwc.socket_name, BSPWC_DEFAULT_SOCKET);
+        server.socket_name = malloc(strlen(BSPWC_DEFAULT_SOCKET) + 1);
+        strcpy(server.socket_name, BSPWC_DEFAULT_SOCKET);
     }
 
-    if (!setup_bspwc(&bspwc))
+    if (!setup_server(&server))
     {
 		wlr_log(L_ERROR, "Unable to setup bspwc");
-        terminate_server(&bspwc);
+        terminate_server(&server);
         exit(EXIT_FAILURE);
     }
 
-    bspwc.input_event = wl_event_loop_add_fd(
-            bspwc.event_loop, bspwc.socket, WL_EVENT_READABLE, read_events, &bspwc);
-    if (!bspwc.input_event)
+    server.wl_event_source = wl_event_loop_add_fd(
+            server.wl_event_loop,
+            server.socket,
+            WL_EVENT_READABLE,
+            read_events,
+            &server
+        );
+    if (!server.wl_event_source)
     {
 		wlr_log(L_ERROR, "Failed to create input event on event loop");
 		exit(EXIT_FAILURE);
     }
 
     // Start BSPWC
-    if (!start_server(&bspwc))
+    if (!start_server(&server))
     {
         wlr_log(L_ERROR, "Failed to start server");
-        terminate_server(&bspwc);
+        terminate_server(&server);
         exit(EXIT_FAILURE);
     }
     
@@ -209,12 +212,12 @@ int main(int argc, char *argv[])
 */
     signal(SIGINT, sig_handler);
 
-    wl_display_run(bspwc.display);
+    wl_display_run(server.wl_display);
 
     // Stop receiving from bspc
-    wl_event_source_remove(bspwc.input_event);
+    wl_event_source_remove(server.wl_event_source);
 
-    terminate_server(&bspwc);
+    terminate_server(&server);
     
     free(config_file);
     free(socket_name);
