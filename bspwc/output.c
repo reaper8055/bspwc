@@ -53,7 +53,7 @@ void output_destroy_notify(struct wl_listener* listener, void* data)
 void output_frame_notify(struct wl_listener* listener, void* data)
 {
     struct output* output = wl_container_of(listener, output, frame);
-    struct server* server = output->server;
+    struct backend* backend = output->server->backend;
     struct wlr_output* wlr_output = data;
     struct wlr_renderer* renderer = wlr_backend_get_renderer(wlr_output->backend);
 
@@ -67,7 +67,7 @@ void output_frame_notify(struct wl_listener* listener, void* data)
         wlr_renderer_clear(renderer, color);
 
         struct wl_resource* wl_resource_surface;
-        wl_resource_for_each(wl_resource_surface, &server->wlr_compositor->surfaces)
+        wl_resource_for_each(wl_resource_surface, &backend->wlr_compositor->surfaces)
         {
             struct wlr_surface* surface = wlr_surface_from_resource(wl_resource_surface);
             if (!wlr_surface_has_buffer(surface))
@@ -90,7 +90,7 @@ void output_frame_notify(struct wl_listener* listener, void* data)
 
 void new_output_notify(struct wl_listener* listener, void* data)
 {
-    struct server* server = wl_container_of(listener, server, new_output);
+    struct backend* backend = wl_container_of(listener, backend, new_output);
     struct wlr_output* wlr_output = data;
 
     wlr_log(L_DEBUG, "Output '%s' added", wlr_output->name);
@@ -105,9 +105,9 @@ void new_output_notify(struct wl_listener* listener, void* data)
 
     struct output* output = calloc(1, sizeof(struct output));
     clock_gettime(CLOCK_MONOTONIC, &output->last_frame);
-    output->server = server;
+    output->server = backend->server;
     output->wlr_output = wlr_output;
-    wl_list_insert(&server->outputs, &output->link);
+    wl_list_insert(&backend->outputs, &output->link);
 
     output->destroy.notify = output_destroy_notify;
     wl_signal_add(&wlr_output->events.destroy, &output->destroy);

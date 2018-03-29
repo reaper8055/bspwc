@@ -1,8 +1,9 @@
 bspwc_src = files(
-    'main.c',
+    'backend.c',
     'config.c',
+    'main.c',
+    'output.c',
     'server.c',
-    'output.c'
 )
 
 bspwc_deps = [

@@ -16,41 +16,8 @@
 #include "bspwc/config.h"
 #include "bspwc/server.h"
 
-#define BSPWC_DEFAULT_SOCKET "/tmp/bspwc_socket"
-
 // TODO: goes in main() if I can find a way to give it to sig_handler()
 struct server server = {0};
-
-static int read_events(int fd, uint32_t mask, void* data)
-{
-    const size_t BUFFER_SIZE = 128u; // TODO: too much or too little?
-    int ret = 0;
-
-    // Get a pointer to the server
-    struct server* s = data;
-
-    int data_socket = accept(s->socket, NULL, NULL);
-    if (data_socket == -1)
-    {
-        wlr_log(L_ERROR, "Failed to accept on socket %s", s->socket_name);
-        return 1;
-    }
-
-    char buffer[BUFFER_SIZE];
-
-    // TODO: Is it blocking?
-    ret = read(data_socket, buffer, BUFFER_SIZE);
-    if (ret == -1)
-    {
-        wlr_log(L_ERROR, "Failed to read on socket %s", s->socket_name);
-        return 1;
-    }
-    buffer[BUFFER_SIZE - 1] = 0;
-
-    wlr_log(L_INFO, "%s", buffer);
-
-    return ret;
-}
 
 void sig_handler(int sig)
 {
@@ -70,7 +37,7 @@ void sig_handler(int sig)
     }
 
     wlr_log(L_INFO, "%s caugh, terminating display", signal);
-	wl_display_terminate(server.wl_display);
+    terminate_server(&server);
 }
 
 int main(int argc, char *argv[])
@@ -80,7 +47,7 @@ int main(int argc, char *argv[])
     char* config_file = NULL;
     char* socket_name = NULL;
 
-    const char* usage = 
+    const char* usage =
         "Usage: bspwc [option]\n"
         "\n"
         " -h, --help\t\tShow this message\n"
@@ -108,7 +75,7 @@ int main(int argc, char *argv[])
         {
             case 'h':
                 fprintf(stdout, "%s", usage);
-			    exit(EXIT_SUCCESS);
+                exit(EXIT_SUCCESS);
                 break;
             case 'c':
                 config_file = malloc(strlen(optarg) + 1);
@@ -146,36 +113,10 @@ int main(int argc, char *argv[])
 
     if (!init_server(&server))
     {
-		wlr_log(L_ERROR, "Failed to init server");
-        exit(EXIT_FAILURE);
-    }
-   
-    // Setup BSPWM related stuff
-    if (server.socket_name == NULL)
-    {
-        server.socket_name = malloc(strlen(BSPWC_DEFAULT_SOCKET) + 1);
-        strcpy(server.socket_name, BSPWC_DEFAULT_SOCKET);
-    }
-
-    if (!setup_server(&server))
-    {
-		wlr_log(L_ERROR, "Unable to setup bspwc");
-        terminate_server(&server);
+        wlr_log(L_ERROR, "Failed to init server");
         exit(EXIT_FAILURE);
     }
 
-    server.wl_event_source = wl_event_loop_add_fd(
-            server.wl_event_loop,
-            server.socket,
-            WL_EVENT_READABLE,
-            read_events,
-            &server
-        );
-    if (!server.wl_event_source)
-    {
-		wlr_log(L_ERROR, "Failed to create input event on event loop");
-		exit(EXIT_FAILURE);
-    }
 
     // Start BSPWC
     if (!start_server(&server))
@@ -184,7 +125,7 @@ int main(int argc, char *argv[])
         terminate_server(&server);
         exit(EXIT_FAILURE);
     }
-    
+
     // If no config_file is given, the default one is
     // $HOME/.config/bspwc/bspwcrc
     if (config_file == NULL)
@@ -194,7 +135,7 @@ int main(int argc, char *argv[])
         {
             wlr_log(L_ERROR, "Failed to get HOME environment variable");
         }
-        
+
         config_file = malloc(strlen(home_dir) + strlen(BSPWC_DEFAUT_CONFIG_FILE) + 1);
         config_file[0] = '\0';
 
@@ -203,22 +144,20 @@ int main(int argc, char *argv[])
     }
 
 /*
+    TODO: load up config file
     if (!load_config_file(config_file))
     {
-		wlr_log(L_ERROR, "Failed to load config file");
+        wlr_log(L_ERROR, "Failed to load config file");
         terminate_server(&bspwc);
         exit(EXIT_FAILURE);
     }
 */
     signal(SIGINT, sig_handler);
 
-    wl_display_run(server.wl_display);
-
-    // Stop receiving from bspc
-    wl_event_source_remove(server.wl_event_source);
+    wl_display_run(server.backend->wl_display);
 
     terminate_server(&server);
-    
+
     free(config_file);
     free(socket_name);
 
