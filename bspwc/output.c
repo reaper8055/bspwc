@@ -1,5 +1,44 @@
 #include "bspwc/output.h"
 
+static void render_surface(struct wlr_output* wlr_output, struct wlr_surface* surface, const int x, const int y)
+{
+    if (!wlr_surface_has_buffer(surface))
+    {
+        return;
+    }
+
+    struct wlr_renderer* renderer = wlr_backend_get_renderer(wlr_output->backend);
+
+    struct wlr_box render_box = {
+        .x = x,
+        .y = y,
+        .width = surface->current->width,
+        .height = surface->current->height
+    };
+
+    float matrix[16];
+    wlr_matrix_project_box(
+            matrix,
+            &render_box,
+            surface->current->transform,
+            0,
+            wlr_output->transform_matrix
+        );
+
+    wlr_render_texture_with_matrix(renderer, surface->texture, matrix, 1.0f);
+
+    struct wlr_subsurface* subsurface;
+    wl_list_for_each(subsurface, &surface->subsurface_list, parent_link)
+    {
+        struct wlr_surface_state *state = subsurface->surface->current;
+        int sx = state->subsurface_position.x;
+        int sy = state->subsurface_position.y;
+
+        render_surface(wlr_output, subsurface->surface, x + sx, y + sy);
+    }
+
+}
+
 void output_destroy_notify(struct wl_listener* listener, void* data)
 {
     struct output* output = wl_container_of(listener, output, destroy);
@@ -36,23 +75,12 @@ void output_frame_notify(struct wl_listener* listener, void* data)
                 continue;
             }
 
-            struct wlr_box render_box = {
-                .x = 20,
-                .y = 20,
-                .width = surface->current->width,
-                .height = surface->current->height
-            };
+            struct wlr_surface_state *state = surface->current;
+            int sx = state->subsurface_position.x;
+            int sy = state->subsurface_position.y;
 
-            float matrix[16];
-            wlr_matrix_project_box(
-                    matrix,
-                    &render_box,
-                    surface->current->transform,
-                    0,
-                    wlr_output->transform_matrix
-                );
+            render_surface(wlr_output, surface, sx, sy);
 
-            wlr_render_texture_with_matrix(renderer, surface->texture, matrix, 1.0f);
             wlr_surface_send_frame_done(surface, &now);
         }
 
@@ -64,6 +92,10 @@ void new_output_notify(struct wl_listener* listener, void* data)
 {
     struct server* server = wl_container_of(listener, server, new_output);
     struct wlr_output* wlr_output = data;
+
+    wlr_log(L_DEBUG, "Output '%s' added", wlr_output->name);
+    wlr_log(L_DEBUG, "%s %s", wlr_output->make, wlr_output->model);
+    wlr_log(L_DEBUG, "%"PRId32"mm x %"PRId32"mm", wlr_output->serial, wlr_output->phys_width, wlr_output->phys_height);
 
     if (!wl_list_empty(&wlr_output->modes))
     {
