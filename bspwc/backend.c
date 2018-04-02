@@ -1,5 +1,59 @@
 #include "bspwc/backend.h"
 
+static void handle_wl_shell_surface(struct wl_listener* listener, void* data)
+{
+    struct wlr_wl_shell_surface* surface = data;
+
+    if (surface->state == WLR_WL_SHELL_SURFACE_STATE_POPUP)
+    {
+        wlr_log(L_DEBUG, "New wl shell popup");
+        return;
+    }
+
+    wlr_log(L_DEBUG, "New wl shell surface: title : %s, class : %s", surface->title, surface->class);
+    wlr_wl_shell_surface_ping(surface);
+}
+
+static void handle_xdg_shell_surface(struct wl_listener* listener, void* data)
+{
+    struct wlr_xdg_surface* surface = data;
+    assert(surface->role != WLR_XDG_SURFACE_ROLE_NONE);
+
+    if (surface->role == WLR_XDG_SURFACE_ROLE_POPUP)
+    {
+        wlr_log(L_DEBUG, "New xdg popup");
+        return;
+    }
+
+    wlr_log(
+            L_DEBUG,
+            "New xdg surface: title : %s, app_id : %s",
+            surface->toplevel->title,
+            surface->toplevel->app_id
+        );
+    wlr_xdg_surface_ping(surface);
+}
+
+static void handle_xdg_shell_v6_surface(struct wl_listener* listener, void* data)
+{
+    struct wlr_xdg_surface_v6* surface = data;
+    assert(surface->role != WLR_XDG_SURFACE_V6_ROLE_NONE);
+
+    if (surface->role == WLR_XDG_SURFACE_V6_ROLE_POPUP)
+    {
+        wlr_log(L_DEBUG, "New xdg v6 popup");
+        return;
+    }
+
+    wlr_log(
+            L_DEBUG,
+            "New xdg v6 surface: title : %s, app_id : %s",
+            surface->toplevel->title,
+            surface->toplevel->app_id
+        );
+    wlr_xdg_surface_v6_ping(surface);
+}
+
 struct backend* create_backend(struct server* server)
 {
     wlr_log(L_INFO, "Creating bspwc backend");
@@ -30,6 +84,18 @@ struct backend* create_backend(struct server* server)
 
     struct wlr_egl* wlr_egl = wlr_backend_get_egl(backend->wlr_backend);
     backend->wlr_linux_dmabuf = wlr_linux_dmabuf_create(backend->wl_display, wlr_egl);
+
+    backend->wl_shell = wlr_wl_shell_create(backend->wl_display);
+    wl_signal_add(&backend->wl_shell->events.new_surface, &backend->wl_shell_surface);
+    backend->wl_shell_surface.notify = handle_wl_shell_surface;
+
+    backend->xdg_shell = wlr_xdg_shell_create(backend->wl_display);
+    wl_signal_add(&backend->xdg_shell->events.new_surface, &backend->xdg_shell_surface);
+    backend->xdg_shell_surface.notify = handle_xdg_shell_surface;
+
+    backend->xdg_shell_v6 = wlr_xdg_shell_v6_create(backend->wl_display);
+    wl_signal_add(&backend->xdg_shell_v6->events.new_surface, &backend->xdg_shell_v6_surface);
+    backend->xdg_shell_surface.notify = handle_xdg_shell_v6_surface;
 
     backend->wlr_compositor = wlr_compositor_create(
             backend->wl_display,
