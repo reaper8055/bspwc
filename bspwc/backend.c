@@ -22,17 +22,19 @@ struct backend* create_backend(struct server* server)
     wl_signal_add(&backend->wlr_backend->events.new_output, &backend->new_output);
 
     wl_display_init_shm(backend->wl_display);
-    wlr_gamma_control_manager_create(backend->wl_display);
-    wlr_screenshooter_create(backend->wl_display);
-    wlr_primary_selection_device_manager_create(backend->wl_display);
-    wlr_idle_create(backend->wl_display);
+    backend->wlr_gamma_control_manager = wlr_gamma_control_manager_create(backend->wl_display);
+    backend->wlr_screenshooter = wlr_screenshooter_create(backend->wl_display);
+    backend->wlr_primary_selection_device_manager = wlr_primary_selection_device_manager_create(backend->wl_display);
+    backend->wlr_idle = wlr_idle_create(backend->wl_display);
+    backend->wlr_idle_inhibit = wlr_idle_inhibit_v1_create(backend->wl_display);
+
+    struct wlr_egl* wlr_egl = wlr_backend_get_egl(backend->wlr_backend);
+    backend->wlr_linux_dmabuf = wlr_linux_dmabuf_create(backend->wl_display, wlr_egl);
 
     backend->wlr_compositor = wlr_compositor_create(
             backend->wl_display,
             wlr_backend_get_renderer(backend->wlr_backend)
         );
-
-    wlr_xdg_shell_v6_create(backend->wl_display);
 
     return backend;
 }

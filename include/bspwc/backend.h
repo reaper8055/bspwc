@@ -7,9 +7,14 @@
 #include <wlr/types/wlr_compositor.h>
 #include <wlr/types/wlr_gamma_control.h>
 #include <wlr/types/wlr_idle.h>
+#include <wlr/types/wlr_idle_inhibit_v1.h>
+#include <wlr/types/wlr_linux_dmabuf.h>
 #include <wlr/types/wlr_primary_selection.h>
 #include <wlr/types/wlr_screenshooter.h>
+#include <wlr/types/wlr_server_decoration.h>
+#include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_xdg_shell_v6.h>
+#include <wlr/types/wlr_wl_shell.h>
 
 #include "bspwc/output.h"
 #include "bspwc/server.h"
@@ -24,6 +29,17 @@ struct backend
 
     struct wlr_backend* wlr_backend;
     struct wlr_compositor* wlr_compositor;
+    struct wlr_gamma_control_manager* wlr_gamma_control_manager;
+    struct wlr_screenshooter* wlr_screenshooter;
+    struct wlr_server_decoration_manager* wlr_server_decoration_manager;
+    struct wlr_primary_selection_device_manager* wlr_primary_selection_device_manager;
+    struct wlr_idle* wlr_idle;
+    struct wlr_idle_inhibit_manager_v1* wlr_idle_inhibit;
+    struct wlr_linux_dmabuf* wlr_linux_dmabuf;
+
+    struct wlr_wl_shell* wlr_wl_shell;
+    struct wlr_xdg_shell_v6* wlr_xdg_shell_v6;
+    struct wlr_xdg_shell* wlr_xdg_shell;
 
     struct wl_listener new_output;
     struct wl_list outputs; // output::link
