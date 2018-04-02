@@ -16,6 +16,6 @@ executable(
     'bspwc',
     bspwc_src,
     include_directories: [inc_folder],
-    dependencies: bspwc_deps,
+    dependencies: [bspwc_deps, wlr_protos],
     install: true
 )

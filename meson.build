@@ -22,9 +22,11 @@ inc_folder = include_directories('include')
 
 cc = meson.get_compiler('c')
 
-wlroots = dependency('wlroots')
-wayland_server = dependency('wayland-server')
-wayland_client = dependency('wayland-client')
-pixman = dependency('pixman-1')
+wlroots         = dependency('wlroots')
+wayland_server  = dependency('wayland-server')
+wayland_client  = dependency('wayland-client')
+wayland_protos  = dependency('wayland-protocols', version: '>=1.12')
+pixman          = dependency('pixman-1')
 
+subdir('protocol')
 subdir('bspwc')
