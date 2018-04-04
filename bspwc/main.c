@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 */
     signal(SIGINT, sig_handler);
 
-    wl_display_run(server.backend->wl_display);
+    wl_display_run(server.wl_display);
 
     terminate_server(&server);
 

@@ -24,6 +24,11 @@ struct server
     int socket;
 
     struct backend* backend;
+
+    struct wl_display* wl_display;
+    struct wl_event_loop* wl_event_loop;
+    struct wl_event_source* wl_event_source;
+
 };
 
 bool init_server(struct server* server);

@@ -4,6 +4,7 @@ bspwc_src = files(
     'main.c',
     'output.c',
     'server.c',
+    'xdg_shell_v6.c',
 )
 
 bspwc_deps = [

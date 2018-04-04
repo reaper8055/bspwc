@@ -1,5 +1,6 @@
 #include "bspwc/server.h"
 
+// TODO : Move to a proper place
 static int read_events(int fd, uint32_t mask, void* data)
 {
     const size_t BUFFER_SIZE = 128u;
@@ -26,7 +27,7 @@ static int read_events(int fd, uint32_t mask, void* data)
     }
     buffer[BUFFER_SIZE - 1] = 0;
 
-    wlr_log(L_INFO, "%s", buffer);
+    wlr_log(L_INFO, "bspwc read : %s", buffer);
 
     return ret;
 }
@@ -35,12 +36,6 @@ bool init_server(struct server* server)
 {
     wlr_log(L_INFO, "Initializing bspwc server");
 
-    // Create wlroots backend
-    server->backend = create_backend(server);
-    if (server->backend == NULL)
-    {
-        wlr_log(L_ERROR, "Failed to create bspwc backend");
-    }
 
     // Create communication socket for bspc
     if (server->socket_name == NULL)
@@ -79,17 +74,28 @@ bool init_server(struct server* server)
 
     wlr_log(L_INFO, "BSPWM socket setup to %s", server->socket_name);
 
-    struct backend* backend = server->backend;
+    server->wl_display = wl_display_create();
+    assert(server->wl_display);
 
-    backend->wl_event_source = wl_event_loop_add_fd(
-            backend->wl_event_loop,
+    server->wl_event_loop = wl_display_get_event_loop(server->wl_display);
+    assert(server->wl_event_loop);
+
+    // Create wlroots backend
+    server->backend = create_backend(server);
+    if (server->backend == NULL)
+    {
+        wlr_log(L_ERROR, "Failed to create bspwc backend");
+    }
+
+    server->wl_event_source = wl_event_loop_add_fd(
+            server->wl_event_loop,
             server->socket,
             WL_EVENT_READABLE,
             read_events,
             &server
         );
 
-    if (!backend->wl_event_source)
+    if (!server->wl_event_source)
     {
         wlr_log(L_ERROR, "Failed to create input event on event loop");
         return false;
@@ -103,7 +109,7 @@ bool start_server(struct server* server)
     wlr_log(L_INFO, "Starting bspwc");
 
     // Wayland display socket
-    const char* wl_socket = wl_display_add_socket_auto(server->backend->wl_display);
+    const char* wl_socket = wl_display_add_socket_auto(server->wl_display);
     if (!wl_socket)
     {
         wlr_log(L_ERROR, "Unable to open wayland socket");
@@ -126,16 +132,14 @@ bool terminate_server(struct server* server)
 {
     wlr_log(L_INFO, "Terminating bspwc");
 
-    struct backend* backend = server->backend;
 
-    //wlr_xcursor_manager_destroy(server->xcursor_manager);
-    //wlr_xcursor_theme_destroy(server->xcursor_theme);
-    //wlr_cursor_destroy(server->cursor);
+    wl_display_destroy(server->wl_display);
 
     // Stop receiving from bspc
-    wl_event_source_remove(backend->wl_event_source);
+    wl_event_source_remove(server->wl_event_source);
 
-    destroy_backend(backend);
+    // Stop backend
+    destroy_backend(server->backend);
 
     return true;
 }
