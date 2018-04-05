@@ -18,7 +18,6 @@
 
 #include "bspwc/output.h"
 #include "bspwc/server.h"
-#include "bspwc/xdg_shell_v6.h"
 
 struct backend
 {
@@ -33,15 +32,11 @@ struct backend
     struct wlr_idle* wlr_idle;
     struct wlr_idle_inhibit_manager_v1* wlr_idle_inhibit;
     struct wlr_linux_dmabuf* wlr_linux_dmabuf;
-
-    struct wlr_xdg_shell_v6* wlr_xdg_shell_v6;
-    struct wl_listener xdg_shell_v6_surface;
-
-    struct wl_listener new_output;
-    struct wl_list outputs; // output::link
 };
 
 struct backend* create_backend(struct server* server);
 void destroy_backend(struct backend* backend);
+
+void render_surface(struct wlr_output* wlr_output, struct wlr_surface* surface, const int x, const int y);
 
 #endif // BACKEND_H

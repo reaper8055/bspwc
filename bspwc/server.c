@@ -36,7 +36,6 @@ bool init_server(struct server* server)
 {
     wlr_log(L_INFO, "Initializing bspwc server");
 
-
     // Create communication socket for bspc
     if (server->socket_name == NULL)
     {
@@ -74,6 +73,7 @@ bool init_server(struct server* server)
 
     wlr_log(L_INFO, "BSPWM socket setup to %s", server->socket_name);
 
+    // Initializing wlroots stuff
     server->wl_display = wl_display_create();
     assert(server->wl_display);
 
@@ -86,6 +86,9 @@ bool init_server(struct server* server)
     {
         wlr_log(L_ERROR, "Failed to create bspwc backend");
     }
+
+    wl_list_init(&server->outputs);
+    server->new_output.notify = new_output_notify;
 
     server->wl_event_source = wl_event_loop_add_fd(
             server->wl_event_loop,

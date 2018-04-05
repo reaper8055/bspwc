@@ -11,10 +11,6 @@ struct backend* create_backend(struct server* server)
     backend->wlr_backend = wlr_backend_autocreate(server->wl_display);
     assert(backend->wlr_backend);
 
-    wl_list_init(&backend->outputs);
-    backend->new_output.notify = new_output_notify;
-    wl_signal_add(&backend->wlr_backend->events.new_output, &backend->new_output);
-
     wl_display_init_shm(server->wl_display);
     backend->wlr_gamma_control_manager = wlr_gamma_control_manager_create(server->wl_display);
     backend->wlr_screenshooter = wlr_screenshooter_create(server->wl_display);
@@ -30,10 +26,7 @@ struct backend* create_backend(struct server* server)
             wlr_backend_get_renderer(backend->wlr_backend)
         );
 
-    // Init shells
-    backend->wlr_xdg_shell_v6 = wlr_xdg_shell_v6_create(server->wl_display);
-    wl_signal_add(&backend->wlr_xdg_shell_v6->events.new_surface, &backend->xdg_shell_v6_surface);
-    backend->xdg_shell_v6_surface.notify = handle_xdg_shell_v6_surface;
+    wl_signal_add(&backend->wlr_backend->events.new_output, &server->new_output);
 
     return backend;
 }
@@ -43,4 +36,43 @@ void destroy_backend(struct backend* backend)
     wlr_backend_destroy(backend->wlr_backend);
 
     free(backend);
+}
+
+void render_surface(struct wlr_output* wlr_output, struct wlr_surface* surface, const int x, const int y)
+{
+    if (!wlr_surface_has_buffer(surface))
+    {
+        return;
+    }
+
+    struct wlr_renderer* renderer = wlr_backend_get_renderer(wlr_output->backend);
+
+    struct wlr_box render_box = {
+        .x = x,
+        .y = y,
+        .width = surface->current->width,
+        .height = surface->current->height
+    };
+
+    float matrix[16];
+    wlr_matrix_project_box(
+            matrix,
+            &render_box,
+            surface->current->transform,
+            0,
+            wlr_output->transform_matrix
+        );
+
+    wlr_render_texture_with_matrix(renderer, surface->texture, matrix, 1.0f);
+
+    struct wlr_subsurface* subsurface;
+    wl_list_for_each(subsurface, &surface->subsurface_list, parent_link)
+    {
+        struct wlr_surface_state *state = subsurface->surface->current;
+        int sx = state->subsurface_position.x;
+        int sy = state->subsurface_position.y;
+
+        render_surface(wlr_output, subsurface->surface, x + sx, y + sy);
+    }
+
 }

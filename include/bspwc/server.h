@@ -29,6 +29,9 @@ struct server
     struct wl_event_loop* wl_event_loop;
     struct wl_event_source* wl_event_source;
 
+    struct wl_list outputs; // output::link
+
+    struct wl_listener new_output;
 };
 
 bool init_server(struct server* server);
