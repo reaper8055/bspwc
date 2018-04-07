@@ -2,7 +2,6 @@
 #define BACKEND_H
 
 #include <wayland-server.h>
-
 #include <wlr/backend.h>
 #include <wlr/types/wlr_compositor.h>
 #include <wlr/types/wlr_gamma_control.h>
@@ -32,6 +31,8 @@ struct backend
     struct wlr_idle* wlr_idle;
     struct wlr_idle_inhibit_manager_v1* wlr_idle_inhibit;
     struct wlr_linux_dmabuf* wlr_linux_dmabuf;
+
+    struct wlr_xdg_shell_v6* wlr_xdg_shell_v6;
 };
 
 struct backend* create_backend(struct server* server);
