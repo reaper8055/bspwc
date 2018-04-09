@@ -17,7 +17,7 @@
 #include "bspwc/backend.h"
 #include "bspwc/common.h"
 #include "bspwc/output.h"
-#include "bspwc/xdg_shell_v6.h"
+#include "bspwc/xdg_surface_v6.h"
 
 struct server
 {

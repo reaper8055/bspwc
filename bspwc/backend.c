@@ -27,9 +27,7 @@ struct backend* create_backend(struct server* server)
     backend->wlr_primary_selection_device_manager = wlr_primary_selection_device_manager_create(server->wl_display);
     backend->wlr_idle = wlr_idle_create(server->wl_display);
     backend->wlr_idle_inhibit = wlr_idle_inhibit_v1_create(server->wl_display);
-
-    struct wlr_egl* wlr_egl = wlr_backend_get_egl(backend->wlr_backend);
-    backend->wlr_linux_dmabuf = wlr_linux_dmabuf_create(server->wl_display, wlr_egl);
+    backend->wlr_linux_dmabuf = wlr_linux_dmabuf_create(server->wl_display, wlr_backend_get_renderer(backend->wlr_backend));
 
     return backend;
 }
