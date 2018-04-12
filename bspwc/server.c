@@ -57,6 +57,8 @@ bool init_server(struct server* server)
 
     wl_list_init(&server->outputs);
 
+    server->input = create_input(server);
+
     // Create communication socket for bspc
     if (server->socket_name == NULL)
     {
@@ -108,7 +110,6 @@ bool init_server(struct server* server)
         return false;
     }
 
-
     return true;
 }
 
@@ -147,6 +148,7 @@ bool terminate_server(struct server* server)
     wl_event_source_remove(server->wl_event_source);
 
     // Stop backend
+    destroy_input(server->input);
     destroy_backend(server->backend);
 
     return true;

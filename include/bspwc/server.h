@@ -16,6 +16,7 @@
 
 #include "bspwc/backend.h"
 #include "bspwc/common.h"
+#include "bspwc/input.h"
 #include "bspwc/output.h"
 #include "bspwc/xdg_surface_v6.h"
 
@@ -25,6 +26,7 @@ struct server
     int socket;
 
     struct backend* backend;
+    struct input* input;
 
     struct wl_display* wl_display;
     struct wl_event_loop* wl_event_loop;
