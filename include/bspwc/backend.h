@@ -22,6 +22,7 @@ struct backend
 {
     struct server* server;
 
+
     struct wlr_backend* wlr_backend;
     struct wlr_compositor* wlr_compositor;
     struct wlr_gamma_control_manager* wlr_gamma_control_manager;
@@ -33,6 +34,11 @@ struct backend
     struct wlr_linux_dmabuf* wlr_linux_dmabuf;
 
     struct wlr_xdg_shell_v6* wlr_xdg_shell_v6;
+
+    struct wl_listener new_xdg_shell_v6;
+    struct wl_listener new_output;
+
+	struct wl_list outputs; // output::link
 };
 
 struct backend* create_backend(struct server* server);

@@ -36,17 +36,15 @@ bool init_server(struct server* server)
 {
     wlr_log(L_INFO, "Initializing bspwc server");
 
-    // Initializing wlroots stuff
+    // Create the display wlroots will render on
     server->wl_display = wl_display_create();
     assert(server->wl_display);
 
+	// Init wayland's shared memory
     wl_display_init_shm(server->wl_display);
 
     server->wl_event_loop = wl_display_get_event_loop(server->wl_display);
     assert(server->wl_event_loop);
-
-    server->new_output.notify = new_output_notify;
-    server->xdg_shell_v6_surface.notify = handle_xdg_shell_v6_surface;
 
     // Create wlroots backend
     server->backend = create_backend(server);
@@ -55,8 +53,7 @@ bool init_server(struct server* server)
         wlr_log(L_ERROR, "Failed to create bspwc backend");
     }
 
-    wl_list_init(&server->outputs);
-
+	// Create wlroots input adaptor
     server->input = create_input(server);
 
     // Create communication socket for bspc
@@ -96,6 +93,7 @@ bool init_server(struct server* server)
 
     wlr_log(L_INFO, "BSPWM socket setup to %s", server->socket_name);
 
+	// Create event listener for bspwm's socket
     server->wl_event_source = wl_event_loop_add_fd(
             server->wl_event_loop,
             server->socket,

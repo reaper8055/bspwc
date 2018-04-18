@@ -51,7 +51,7 @@ void output_frame_notify(struct wl_listener* listener, void* data)
 
 void new_output_notify(struct wl_listener* listener, void* data)
 {
-    struct server* server = wl_container_of(listener, server, new_output);
+    struct backend* backend = wl_container_of(listener, backend, new_output);
     struct wlr_output* wlr_output = data;
 
     wlr_log(L_DEBUG, "Output '%s' added", wlr_output->name);
@@ -66,9 +66,9 @@ void new_output_notify(struct wl_listener* listener, void* data)
 
     struct output* output = calloc(1, sizeof(struct output));
     clock_gettime(CLOCK_MONOTONIC, &output->last_frame);
-    output->server = server;
+    output->server = backend->server;
     output->wlr_output = wlr_output;
-    wl_list_insert(&server->outputs, &output->link);
+    wl_list_insert(&backend->outputs, &output->link);
 
     output->destroy.notify = output_destroy_notify;
     wl_signal_add(&wlr_output->events.destroy, &output->destroy);

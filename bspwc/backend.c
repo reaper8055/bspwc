@@ -5,20 +5,18 @@ struct backend* create_backend(struct server* server)
     wlr_log(L_INFO, "Creating bspwc backend");
 
     struct backend* backend = calloc(1, sizeof(struct backend));
+	if (backend == NULL)
+	{
+		wlr_log(L_ERROR, "Could not create backend");
+		return NULL;
+	}
 
     backend->server = server;
 
     backend->wlr_backend = wlr_backend_autocreate(server->wl_display);
     assert(backend->wlr_backend);
 
-    // Wire signals
-    wl_signal_add(&backend->wlr_backend->events.new_output, &server->new_output);
-
-    backend->wlr_xdg_shell_v6 = wlr_xdg_shell_v6_create(server->wl_display);
-    wl_signal_add(&backend->wlr_xdg_shell_v6->events.new_surface, &server->xdg_shell_v6_surface);
-
-
-    backend->wlr_compositor = wlr_compositor_create(
+	backend->wlr_compositor = wlr_compositor_create(
             server->wl_display,
             wlr_backend_get_renderer(backend->wlr_backend)
         );
@@ -28,6 +26,18 @@ struct backend* create_backend(struct server* server)
     backend->wlr_idle = wlr_idle_create(server->wl_display);
     backend->wlr_idle_inhibit = wlr_idle_inhibit_v1_create(server->wl_display);
     backend->wlr_linux_dmabuf = wlr_linux_dmabuf_create(server->wl_display, wlr_backend_get_renderer(backend->wlr_backend));
+
+    wl_list_init(&backend->outputs);
+
+	// wlroots's shells
+	backend->wlr_xdg_shell_v6 = wlr_xdg_shell_v6_create(server->wl_display);
+
+	// Wire listeners
+	backend->new_output.notify = new_output_notify;
+	wl_signal_add(&backend->wlr_backend->events.new_output, &backend->new_output);
+
+	backend->new_xdg_shell_v6.notify = handle_xdg_shell_v6_surface;
+	wl_signal_add(&backend->wlr_xdg_shell_v6->events.new_surface, &backend->new_xdg_shell_v6);
 
     return backend;
 }

@@ -38,7 +38,7 @@ void handle_xdg_shell_v6_surface(struct wl_listener* listener, void* data)
         return;
     }
 
-    struct server* server = wl_container_of(listener, server, xdg_shell_v6_surface);
+    //struct backend* backend = wl_container_of(listener, backend, xdg_shell_v6_surface);
 
     wlr_log(L_DEBUG, "new xdg v6 toplevel: title=%s, app_id=%s",
             wlr_xdg_surface_v6->toplevel->title, wlr_xdg_surface_v6->toplevel->app_id
