@@ -37,7 +37,7 @@ void sig_handler(int sig)
     }
 
     wlr_log(L_INFO, "%s caugh, terminating display", signal);
-    terminate_server(&server);
+	wl_display_terminate(server.display);
 }
 
 int main(int argc, char *argv[])
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 */
     signal(SIGINT, sig_handler);
 
-    wl_display_run(server.wl_display);
+    wl_display_run(server.display);
 
     terminate_server(&server);
 

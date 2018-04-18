@@ -22,15 +22,15 @@
 
 struct server
 {
-    char* socket_name;
-    int socket;
+	char* socket_name;
+	int socket;
 
-    struct backend* backend;
-    struct input* input;
+	struct backend* backend;
+	struct input* input;
 
-    struct wl_display* wl_display;
-    struct wl_event_loop* wl_event_loop;
-    struct wl_event_source* wl_event_source;
+	struct wl_display* display;
+	struct wl_event_loop* event_loop;
+	struct wl_event_source* event_source;
 };
 
 bool init_server(struct server* server);
