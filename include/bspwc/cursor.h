@@ -14,7 +14,7 @@ struct cursor
 	struct wlr_xcursor_manager* xcursor_manager;
 };
 
-struct cursor* create_cursor();
+struct cursor* create_cursor(struct input* input);
 void destroy_cursor(struct cursor* cursor);
 
 #endif // CURSOR_H
