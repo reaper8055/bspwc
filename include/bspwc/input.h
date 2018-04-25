@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include <wayland-server.h>
+#include <wlr/xcursor.h>
 #include <wlr/types/wlr_box.h>
 #include <wlr/types/wlr_input_device.h>
 #include <wlr/types/wlr_seat.h>
@@ -16,6 +17,8 @@ struct input
 	struct server* server;
 
 	struct cursor* cursor;
+
+	struct wlr_xcursor_theme* xcursor_theme;
 
 	struct wl_listener new_input;
 };

@@ -62,6 +62,15 @@ struct input* create_input(struct server* server)
 
 	input->cursor = NULL;
 
+	// TODO : handle HIDPI cursor
+	input->xcursor_theme = wlr_xcursor_theme_load("default", 16);
+	if (input->xcursor_theme == NULL)
+	{
+		wlr_log(L_ERROR, "Failed to load xcursor theme");
+		free(input);
+		return NULL;
+	}
+
 	input->new_input.notify = handle_new_input;
 	wl_signal_add(&server->backend->wlr_backend->events.new_input, &input->new_input);
 
@@ -74,6 +83,8 @@ void destroy_input(struct input* input)
 	{
 		destroy_cursor(input->cursor);
 	}
+
+	wlr_xcursor_theme_destroy(input->xcursor_theme);
 
 	free(input);
 }
