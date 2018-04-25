@@ -3,20 +3,21 @@
 
 #include <wayland-server.h>
 #include <wlr/types/wlr_box.h>
-#include <wlr/types/wlr_cursor.h>
 #include <wlr/types/wlr_input_device.h>
 #include <wlr/types/wlr_seat.h>
 
+#include "bspwc/cursor.h"
 #include "bspwc/server.h"
 
 #define INPUT_DEFAULT_SEAT_NAME "DEFAULT_SEAT"
 
 struct input
 {
-    struct server* server;
+	struct server* server;
 
-    struct wl_listener new_input;
-    struct wl_list seats;
+	struct cursor* cursor;
+
+	struct wl_listener new_input;
 };
 
 const char* device_type(enum wlr_input_device_type type);
