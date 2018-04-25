@@ -12,6 +12,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include <wlr/types/wlr_output_layout.h>
 #include <wlr/util/log.h>
 
 #include "bspwc/backend.h"
@@ -31,6 +32,8 @@ struct server
 	struct wl_display* display;
 	struct wl_event_loop* event_loop;
 	struct wl_event_source* event_source;
+
+	struct wlr_output_layout* output_layout;
 };
 
 bool init_server(struct server* server);
