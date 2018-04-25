@@ -151,7 +151,5 @@ bool terminate_server(struct server* server)
 	wl_event_source_remove(server->event_source);
 	wl_display_destroy(server->display);
 
-	free(server);
-
 	return true;
 }
