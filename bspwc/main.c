@@ -16,8 +16,7 @@
 #include "bspwc/config.h"
 #include "bspwc/server.h"
 
-// TODO: goes in main() if I can find a way to give it to sig_handler()
-struct server server = {0};
+struct wl_display* display = NULL;
 
 void sig_handler(int sig)
 {
@@ -37,7 +36,7 @@ void sig_handler(int sig)
     }
 
     wlr_log(L_INFO, "%s caugh, terminating display", signal);
-	wl_display_terminate(server.display);
+	wl_display_terminate(display);
 }
 
 int main(int argc, char *argv[])
@@ -46,6 +45,8 @@ int main(int argc, char *argv[])
 
     char* config_file = NULL;
     char* socket_name = NULL;
+
+	struct server server = {0};
 
     const char* usage =
         "Usage: bspwc [option]\n"
@@ -117,6 +118,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+	display = server.display;
 
     // Start BSPWC
     if (!start_server(&server))
