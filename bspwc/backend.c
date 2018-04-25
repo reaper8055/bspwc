@@ -77,7 +77,7 @@ void render_surface(struct wlr_output* wlr_output, struct wlr_surface* surface, 
     wlr_render_texture_with_matrix(renderer, surface->texture, matrix, 1.0f);
 
     struct wlr_subsurface* subsurface;
-    wl_list_for_each(subsurface, &surface->subsurface_list, parent_link)
+    wl_list_for_each(subsurface, &surface->subsurfaces, parent_link)
     {
         struct wlr_surface_state *state = subsurface->surface->current;
         int sx = state->subsurface_position.x;
