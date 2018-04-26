@@ -76,6 +76,7 @@ void new_output_notify(struct wl_listener* listener, void* data)
 	output->server = backend->server;
 	output->wlr_output = wlr_output;
 
+	// TODO : make output position rearrangeable
 	wlr_output_layout_add_auto(output->server->output_layout, output->wlr_output);
 
 	wl_list_insert(&backend->outputs, &output->link);
