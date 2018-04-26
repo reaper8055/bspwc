@@ -70,7 +70,7 @@ void new_output_notify(struct wl_listener* listener, void* data)
 
 	wlr_log(L_DEBUG, "Output '%s' added", wlr_output->name);
 	wlr_log(L_DEBUG, "%s %s", wlr_output->make, wlr_output->model);
-	wlr_log(L_DEBUG, "%"PRId32"mm x %"PRId32"mm", wlr_output->serial, wlr_output->phys_width, wlr_output->phys_height);
+	wlr_log(L_DEBUG, "%s %"PRId32"mm x %"PRId32"mm", wlr_output->serial, wlr_output->phys_width, wlr_output->phys_height);
 
 	clock_gettime(CLOCK_MONOTONIC, &output->last_frame);
 	output->server = backend->server;
