@@ -22,7 +22,6 @@ struct backend
 {
     struct server* server;
 
-
     struct wlr_backend* wlr_backend;
     struct wlr_compositor* wlr_compositor;
     struct wlr_gamma_control_manager* wlr_gamma_control_manager;

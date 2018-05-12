@@ -12,7 +12,6 @@ struct cursor
 	struct input* input;
 
 	struct wlr_cursor* cursor;
-	struct wlr_xcursor* xcursor;
 
 	struct wl_listener motion;
 	struct wl_listener motion_absolute;

@@ -41,27 +41,6 @@ struct cursor* create_cursor(struct input* input)
 
 	wlr_cursor_attach_output_layout(cursor->cursor, output_layout);
 
-	// TODO : cursor theme should be customizable
-	cursor->xcursor = wlr_xcursor_theme_get_cursor(input->xcursor_theme, "left_ptr");
-	if (cursor->xcursor == NULL)
-	{
-		wlr_log(L_ERROR, "Failed to load left_ptr cursor");
-		destroy_cursor(cursor);
-		return NULL;
-	}
-
-	// TODO : why 0?
-	struct wlr_xcursor_image* image = cursor->xcursor->images[0];
-	wlr_cursor_set_image(
-			cursor->cursor,
-			image->buffer,
-			image->width * 4,
-			image->width,
-			image->height,
-			image->hotspot_x,
-			image->hotspot_y,
-			0
-		);
 
 	struct wlr_box* layout_box = wlr_output_layout_get_box(output_layout, NULL);
 	wlr_cursor_warp(cursor->cursor, NULL, layout_box->width / 2 , layout_box->height / 2);
