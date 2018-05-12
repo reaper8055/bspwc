@@ -31,7 +31,6 @@ struct cursor* create_cursor(struct input* input)
 	cursor->input = input;
 
 	struct wlr_output_layout* output_layout = input->server->output_layout;
-	struct wlr_box* layout_box = wlr_output_layout_get_box(output_layout, NULL);
 
 	cursor->cursor = wlr_cursor_create();
 	if (cursor->cursor == NULL)
@@ -41,10 +40,6 @@ struct cursor* create_cursor(struct input* input)
 	}
 
 	wlr_cursor_attach_output_layout(cursor->cursor, output_layout);
-	wlr_cursor_map_to_region(
-			cursor->cursor,
-			layout_box
-		);
 
 	// TODO : cursor theme should be customizable
 	cursor->xcursor = wlr_xcursor_theme_get_cursor(input->xcursor_theme, "left_ptr");
@@ -68,6 +63,7 @@ struct cursor* create_cursor(struct input* input)
 			0
 		);
 
+	struct wlr_box* layout_box = wlr_output_layout_get_box(output_layout, NULL);
 	wlr_cursor_warp(cursor->cursor, NULL, layout_box->width / 2 , layout_box->height / 2);
 
 	// Setup callbacks

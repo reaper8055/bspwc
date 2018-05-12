@@ -76,9 +76,6 @@ void new_output_notify(struct wl_listener* listener, void* data)
 	output->server = backend->server;
 	output->wlr_output = wlr_output;
 
-	// TODO : make output position rearrangeable
-	wlr_output_layout_add_auto(output->server->output_layout, output->wlr_output);
-
 	wl_list_insert(&backend->outputs, &output->link);
 
 	output->destroy.notify = output_destroy_notify;
@@ -86,6 +83,9 @@ void new_output_notify(struct wl_listener* listener, void* data)
 
 	output->frame.notify = output_frame_notify;
 	wl_signal_add(&wlr_output->events.frame, &output->frame);
+
+	// TODO : make output position rearrangeable
+	wlr_output_layout_add_auto(output->server->output_layout, output->wlr_output);
 
 	wlr_output_create_global(wlr_output);
 }
