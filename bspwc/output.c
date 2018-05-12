@@ -30,7 +30,7 @@ void output_frame_notify(struct wl_listener* listener, void* data)
 		wlr_renderer_clear(renderer, color);
 
 		struct wl_resource* wl_resource_surface;
-		wl_resource_for_each(wl_resource_surface, &backend->wlr_compositor->surfaces)
+		wl_resource_for_each(wl_resource_surface, &backend->wlr_compositor->surface_resources)
 		{
 			struct wlr_surface* surface = wlr_surface_from_resource(wl_resource_surface);
 			if (!wlr_surface_has_buffer(surface))
