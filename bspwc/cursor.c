@@ -5,17 +5,13 @@ void handle_cursor_motion(struct wl_listener* listener, void* data)
 	struct cursor* cursor = wl_container_of(listener, cursor, motion);
 	struct wlr_event_pointer_motion* event = data;
 
-	wlr_log(L_DEBUG, "Cursor %d, %d", event->delta_x, event->delta_y);
-
 	wlr_cursor_move(cursor->wlr_cursor, event->device, event->delta_x, event->delta_y);
 }
 
 void handle_cursor_motion_absolute(struct wl_listener* listener, void* data)
 {
-	struct cursor* cursor = wl_container_of(listener, cursor, motion);
+	struct cursor* cursor = wl_container_of(listener, cursor, motion_absolute);
 	struct wlr_event_pointer_motion_absolute* event = data;
-
-	wlr_log(L_DEBUG, "Cursor absolute %d, %d", event->x, event->y);
 
 	wlr_cursor_warp_absolute(cursor->wlr_cursor, event->device, event->x, event->y);
 }
