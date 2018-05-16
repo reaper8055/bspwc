@@ -11,7 +11,14 @@ void handle_cursor_motion(struct wl_listener* listener, void* data)
 }
 
 void handle_cursor_motion_absolute(struct wl_listener* listener, void* data)
-{}
+{
+	struct cursor* cursor = wl_container_of(listener, cursor, motion);
+	struct wlr_event_pointer_motion_absolute* event = data;
+
+	wlr_log(L_DEBUG, "Cursor absolute %d, %d", event->x, event->y);
+
+	wlr_cursor_warp_absolute(cursor->wlr_cursor, event->device, event->x, event->y);
+}
 
 void handle_cursor_button(struct wl_listener* listener, void* data)
 {}
@@ -19,7 +26,7 @@ void handle_cursor_button(struct wl_listener* listener, void* data)
 void handle_cursor_axis(struct wl_listener* listener, void* data)
 {}
 
-struct cursor* create_cursor(struct input* input)
+struct cursor* create_cursor(struct input* input, struct wlr_input_device* device)
 {
 	struct cursor* cursor = calloc(1, sizeof(struct cursor));
 	if (cursor == NULL)
@@ -30,36 +37,27 @@ struct cursor* create_cursor(struct input* input)
 
 	cursor->input = input;
 
-	struct wlr_output_layout* output_layout = input->server->output_layout;
-
 	cursor->wlr_cursor = wlr_cursor_create();
 	if (cursor->wlr_cursor == NULL)
 	{
 		wlr_log(L_ERROR, "Failed to create cursor's wlr_cursor");
 		free(cursor);
 	}
-	
-	cursor->wlr_xcursor_theme = wlr_xcursor_theme_load("default", 16);
-	if (cursor->wlr_xcursor_theme == NULL)
-	{
-		wlr_log(L_ERROR, "Failed to load xcursor theme");
-		free(cursor);
-		return NULL;
-	}
+	wlr_cursor_attach_input_device(cursor->wlr_cursor, device);
 
-	cursor->wlr_xcursor = wlr_xcursor_theme_get_cursor(cursor->wlr_xcursor_theme, "left_ptr");
-	if (cursor->wlr_cursor == NULL)
+	struct wlr_output_layout* output_layout = input->server->output_layout;
+	wlr_cursor_attach_output_layout(cursor->wlr_cursor, output_layout);
+
+	cursor->wlr_xcursor_manager = wlr_xcursor_manager_create("default", 24);
+	if (cursor->wlr_xcursor_manager == NULL)
 	{
 		wlr_log(L_ERROR, "Failed to load left_ptr cursor");
 		free(cursor);
 		return NULL;
 	}
 
-	struct wlr_xcursor_image* image = cursor->wlr_xcursor->images[0];
-	wlr_cursor_set_image(cursor->wlr_cursor, image->buffer, image->width * 4,
-		image->width, image->height, image->hotspot_x, image->hotspot_y, 0);
-
-	wlr_cursor_attach_output_layout(cursor->wlr_cursor, output_layout);
+	wlr_xcursor_manager_load(cursor->wlr_xcursor_manager, 1);
+	wlr_xcursor_manager_set_cursor_image(cursor->wlr_xcursor_manager, "left_ptr", cursor->wlr_cursor);
 
 	struct wlr_box* layout_box = wlr_output_layout_get_box(output_layout, NULL);
 	wlr_cursor_warp(cursor->wlr_cursor, NULL, layout_box->width / 2 , layout_box->height / 2);
@@ -82,7 +80,7 @@ struct cursor* create_cursor(struct input* input)
 
 void destroy_cursor(struct cursor* cursor)
 {
+	wlr_xcursor_manager_destroy(cursor->wlr_xcursor_manager);
 	wlr_cursor_destroy(cursor->wlr_cursor);
-	wlr_xcursor_theme_destroy(cursor->wlr_xcursor_theme);
 	free(cursor);
 }

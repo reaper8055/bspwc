@@ -37,7 +37,7 @@ void handle_new_input(struct wl_listener* listener, void* data)
 	{
 		if (input->cursor == NULL)
 		{
-			input->cursor = create_cursor(input);
+			input->cursor = create_cursor(input, device);
 		}
 	}
 	else
