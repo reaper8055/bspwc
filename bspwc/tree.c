@@ -33,6 +33,11 @@ void node_destroy(struct node* node)
 
 bool insert(enum insert_mode mode, struct node* root, struct node* child)
 {
+	if (root == NULL || child == NULL)
+	{
+		wlr_log(L_ERROR, "Root or child are NULL");
+	}
+
 	wlr_log(L_DEBUG, "Inserting %p", (void*)child);
 
 	struct node* candidate = root;
@@ -100,4 +105,9 @@ bool insert(enum insert_mode mode, struct node* root, struct node* child)
 	}
 
 	return true;
+}
+
+bool is_leaf(struct node* node)
+{
+	return (node != NULL && node->parent != NULL && node->left == NULL && node->right == NULL);
 }
