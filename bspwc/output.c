@@ -38,11 +38,8 @@ void output_frame_notify(struct wl_listener* listener, void* data)
 				continue;
 			}
 
-			struct wlr_surface_state *state = surface->current;
-			int sx = state->subsurface_position.x;
-			int sy = state->subsurface_position.y;
-
-			render_surface(wlr_output, surface, sx, sy);
+			struct wlr_surface_state* state = &surface->current;
+			render_surface(wlr_output, surface, state->dx, state->dy);
 
 			wlr_surface_send_frame_done(surface, &now);
 		}

@@ -61,15 +61,15 @@ void render_surface(struct wlr_output* wlr_output, struct wlr_surface* surface, 
 	struct wlr_box render_box = {
 			.x = x,
 			.y = y,
-			.width = surface->current->width,
-			.height = surface->current->height
+			.width = surface->current.width,
+			.height = surface->current.height
 		};
 
 	float matrix[16];
 	wlr_matrix_project_box(
 			matrix,
 			&render_box,
-			surface->current->transform,
+			surface->current.transform,
 			0,
 			wlr_output->transform_matrix
 		);
@@ -80,11 +80,8 @@ void render_surface(struct wlr_output* wlr_output, struct wlr_surface* surface, 
 	struct wlr_subsurface* subsurface;
 	wl_list_for_each(subsurface, &surface->subsurfaces, parent_link)
 	{
-		struct wlr_surface_state *state = subsurface->surface->current;
-		int sx = state->subsurface_position.x;
-		int sy = state->subsurface_position.y;
-
-		render_surface(wlr_output, subsurface->surface, x + sx, y + sy);
+		struct wlr_surface_state* state = &subsurface->surface->current;
+		render_surface(wlr_output, subsurface->surface, x + state->dx, y + state->dy);
 	}
 }
 
