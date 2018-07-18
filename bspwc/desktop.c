@@ -2,12 +2,12 @@
 
 struct desktop* create_desktop(struct output* output)
 {
-	wlr_log(L_DEBUG, "Creating desktop for %s", output->wlr_output->name);
+	wlr_log(WLR_DEBUG, "Creating desktop for %s", output->wlr_output->name);
 
 	struct desktop* desktop = calloc(1, sizeof(struct desktop));
 	if (desktop == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to allocate desktop");
+		wlr_log(WLR_ERROR, "Failed to allocate desktop");
 		return NULL;
 	}
 
@@ -25,7 +25,7 @@ struct desktop* create_desktop(struct output* output)
 }
 void destroy_desktop(struct desktop* desktop)
 {
-	wlr_log(L_DEBUG, "Destroying desktop %s", desktop->name);
+	wlr_log(WLR_DEBUG, "Destroying desktop %s", desktop->name);
 
 	free(desktop);
 }

@@ -2,7 +2,7 @@
 
 struct node* node_create()
 {
-	wlr_log(L_DEBUG, "Creating node");
+	wlr_log(WLR_DEBUG, "Creating node");
 	struct node* node = calloc(1, sizeof(struct node));
 
 	node->window = NULL;
@@ -16,7 +16,7 @@ struct node* node_create()
 
 void node_destroy(struct node* node)
 {
-	wlr_log(L_DEBUG, "Destroying node");
+	wlr_log(WLR_DEBUG, "Destroying node");
 	if (node->left != NULL)
 	{
 		node_destroy(node->left);
@@ -35,22 +35,22 @@ bool insert(enum insert_mode mode, struct node* root, struct node* child)
 {
 	if (root == NULL || child == NULL)
 	{
-		wlr_log(L_ERROR, "Root or child are NULL");
+		wlr_log(WLR_ERROR, "Root or child are NULL");
 	}
 
-	wlr_log(L_DEBUG, "Inserting %p", (void*)child);
+	wlr_log(WLR_DEBUG, "Inserting %p", (void*)child);
 
 	struct node* candidate = root;
 
 	while (true)
 	{
-		wlr_log(L_DEBUG, "Candidate %p", (void*)candidate);
+		wlr_log(WLR_DEBUG, "Candidate %p", (void*)candidate);
 		// Real root case
 		if (candidate->parent == NULL)
 		{
 			if ((candidate->left == NULL) && (candidate->right == NULL))
 			{
-				wlr_log(L_DEBUG, "Insert at root");
+				wlr_log(WLR_DEBUG, "Insert at root");
 				break;
 			}
 		}
@@ -80,7 +80,7 @@ bool insert(enum insert_mode mode, struct node* root, struct node* child)
 			}
 		}
 
-		wlr_log(L_ERROR, "Error founding insertion candidate");
+		wlr_log(WLR_ERROR, "Error founding insertion candidate");
 		return false;
 
 	}
@@ -93,13 +93,13 @@ bool insert(enum insert_mode mode, struct node* root, struct node* child)
 
 	if (mode == RIGHT)
 	{
-		wlr_log(L_DEBUG, "Inserting into right of %p", (void*)root);
+		wlr_log(WLR_DEBUG, "Inserting into right of %p", (void*)root);
 		root->left = new_child;
 		root->right = child;
 	}
 	else if (mode == LEFT)
 	{
-		wlr_log(L_DEBUG, "Inserting into left of %p", (void*)root);
+		wlr_log(WLR_DEBUG, "Inserting into left of %p", (void*)root);
 		root->left = child;
 		root->right = new_child;
 	}

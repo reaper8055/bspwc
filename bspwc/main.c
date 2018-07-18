@@ -35,7 +35,7 @@ void sig_handler(int sig)
 			break;
 	}
 
-	wlr_log(L_INFO, "%s caugh, terminating display", signal);
+	wlr_log(WLR_INFO, "%s caugh, terminating display", signal);
 	wl_display_terminate(display);
 }
 
@@ -101,20 +101,20 @@ int main(int argc, char *argv[])
 
 	if (debug)
 	{
-		wlr_log_init(L_DEBUG, NULL);
+		wlr_log_init(WLR_DEBUG, NULL);
 	}
 	else if (verbose)
 	{
-		wlr_log_init(L_INFO, NULL);
+		wlr_log_init(WLR_INFO, NULL);
 	}
 	else
 	{
-		wlr_log_init(L_ERROR, NULL);
+		wlr_log_init(WLR_ERROR, NULL);
 	}
 
 	if (init_server(&server) == false)
 	{
-		wlr_log(L_ERROR, "Failed to initialize bspwc server");
+		wlr_log(WLR_ERROR, "Failed to initialize bspwc server");
 		exit(EXIT_FAILURE);
 	}
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 	if (config_server(&server) == false)
 	{
-		wlr_log(L_ERROR, "Failed to configure bspwc server");
+		wlr_log(WLR_ERROR, "Failed to configure bspwc server");
 		terminate_server(&server);
 		exit(EXIT_FAILURE);
 	}
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 	// Start BSPWC
 	if (!start_server(&server))
 	{
-		wlr_log(L_ERROR, "Failed to start server");
+		wlr_log(WLR_ERROR, "Failed to start server");
 		terminate_server(&server);
 		exit(EXIT_FAILURE);
 	}
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 		char* home_dir = getenv("HOME");
 		if(home_dir == NULL)
 		{
-			wlr_log(L_ERROR, "Failed to get HOME environment variable");
+			wlr_log(WLR_ERROR, "Failed to get HOME environment variable");
 		}
 
 		config_file = malloc(strlen(home_dir) + strlen(BSPWC_DEFAUT_CONFIG_FILE) + 1);
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 	TODO: load up config file
 	if (!load_config_file(config_file))
 	{
-		wlr_log(L_ERROR, "Failed to load config file");
+		wlr_log(WLR_ERROR, "Failed to load config file");
 		terminate_server(&bspwc);
 		exit(EXIT_FAILURE);
 	}

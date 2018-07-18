@@ -2,12 +2,12 @@
 
 struct backend* create_backend(struct server* server)
 {
-	wlr_log(L_INFO, "Creating bspwc backend");
+	wlr_log(WLR_INFO, "Creating bspwc backend");
 
 	struct backend* backend = calloc(1, sizeof(struct backend));
 	if (backend == NULL)
 	{
-		wlr_log(L_ERROR, "Could not create backend");
+		wlr_log(WLR_ERROR, "Could not create backend");
 		return NULL;
 	}
 
@@ -102,7 +102,7 @@ bool insert_window_to_backend(struct backend* backend, struct window* window)
 
 	if (wlr_output == NULL)
 	{
-		wlr_log(L_ERROR, "Inserting window %s in an empty layout", window->title);
+		wlr_log(WLR_ERROR, "Inserting window %s in an empty layout", window->title);
 		return false;
 	}
 
@@ -118,7 +118,7 @@ bool insert_window_to_backend(struct backend* backend, struct window* window)
 
 	if (output == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to found output to insert window %s", window->title);
+		wlr_log(WLR_ERROR, "Failed to found output to insert window %s", window->title);
 		return false;
 	}
 

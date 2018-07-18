@@ -34,19 +34,19 @@ void handle_xdg_shell_v6_surface(struct wl_listener* listener, void* data)
 
 	if (wlr_xdg_surface_v6->role == WLR_XDG_SURFACE_V6_ROLE_POPUP)
 	{
-		wlr_log(L_INFO, "New xdg_v6 popup");
+		wlr_log(WLR_INFO, "New xdg_v6 popup");
 		return;
 	}
 
 	char* title = wlr_xdg_surface_v6->toplevel->title;
 
-	wlr_log(L_INFO, "New xdg_v6 toplevel: title=%s, app_id=%s", title, wlr_xdg_surface_v6->toplevel->app_id);
+	wlr_log(WLR_INFO, "New xdg_v6 toplevel: title=%s, app_id=%s", title, wlr_xdg_surface_v6->toplevel->app_id);
 	wlr_xdg_surface_v6_ping(wlr_xdg_surface_v6);
 
 	struct xdg_surface_v6* surface = calloc(1, sizeof(struct xdg_surface_v6));
 	if (surface == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create surface for %s", title);
+		wlr_log(WLR_ERROR, "Failed to create surface for %s", title);
 		return;
 	}
 
@@ -82,7 +82,7 @@ void handle_xdg_shell_v6_surface(struct wl_listener* listener, void* data)
 	struct window* window = create_window();
 	if (window == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create window for %s", title);
+		wlr_log(WLR_ERROR, "Failed to create window for %s", title);
 		free(surface);
 		return;
 	}
@@ -106,6 +106,6 @@ void handle_xdg_shell_v6_surface(struct wl_listener* listener, void* data)
 	struct backend* backend = wl_container_of(listener, backend, new_xdg_shell_v6);
 	if (insert_window_to_backend(backend, window) == false)
 	{
-		wlr_log(L_ERROR, "Failed to insert window into desktop");
+		wlr_log(WLR_ERROR, "Failed to insert window into desktop");
 	}
 }

@@ -65,12 +65,12 @@ void new_output_notify(struct wl_listener* listener, void* data)
 	struct output* output = calloc(1, sizeof(struct output));
 	if (output == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create output %s", wlr_output->name);
+		wlr_log(WLR_ERROR, "Failed to create output %s", wlr_output->name);
 	}
 
-	wlr_log(L_DEBUG, "Output '%s' added", wlr_output->name);
-	wlr_log(L_DEBUG, "%s %s", wlr_output->make, wlr_output->model);
-	wlr_log(L_DEBUG, "%s %"PRId32"mm x %"PRId32"mm", wlr_output->serial, wlr_output->phys_width, wlr_output->phys_height);
+	wlr_log(WLR_DEBUG, "Output '%s' added", wlr_output->name);
+	wlr_log(WLR_DEBUG, "%s %s", wlr_output->make, wlr_output->model);
+	wlr_log(WLR_DEBUG, "%s %"PRId32"mm x %"PRId32"mm", wlr_output->serial, wlr_output->phys_width, wlr_output->phys_height);
 
 	clock_gettime(CLOCK_MONOTONIC, &output->last_frame);
 	output->server = backend->server;
@@ -92,6 +92,6 @@ void new_output_notify(struct wl_listener* listener, void* data)
 	output->desktop = create_desktop(output);
 	if (output->desktop == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create default desktop for %s", wlr_output->name);
+		wlr_log(WLR_ERROR, "Failed to create default desktop for %s", wlr_output->name);
 	}
 }

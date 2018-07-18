@@ -27,7 +27,7 @@ struct cursor* create_cursor(struct input* input, struct wlr_input_device* devic
 	struct cursor* cursor = calloc(1, sizeof(struct cursor));
 	if (cursor == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create cursor");
+		wlr_log(WLR_ERROR, "Failed to create cursor");
 		return NULL;
 	}
 
@@ -36,7 +36,7 @@ struct cursor* create_cursor(struct input* input, struct wlr_input_device* devic
 	cursor->wlr_cursor = wlr_cursor_create();
 	if (cursor->wlr_cursor == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create cursor's wlr_cursor");
+		wlr_log(WLR_ERROR, "Failed to create cursor's wlr_cursor");
 		free(cursor);
 	}
 	wlr_cursor_attach_input_device(cursor->wlr_cursor, device);
@@ -47,7 +47,7 @@ struct cursor* create_cursor(struct input* input, struct wlr_input_device* devic
 	cursor->wlr_xcursor_manager = wlr_xcursor_manager_create("default", 24);
 	if (cursor->wlr_xcursor_manager == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to load left_ptr cursor");
+		wlr_log(WLR_ERROR, "Failed to load left_ptr cursor");
 		free(cursor);
 		return NULL;
 	}

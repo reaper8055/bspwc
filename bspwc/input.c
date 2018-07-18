@@ -27,11 +27,11 @@ void handle_new_input(struct wl_listener* listener, void* data)
 	struct wlr_input_device* device = data;
 	enum wlr_input_device_type type = device->type;
 
-	wlr_log(L_DEBUG, "New input device: %s (%d:%d) %s", device->name, device->vendor, device->product, device_type(type));
+	wlr_log(WLR_DEBUG, "New input device: %s (%d:%d) %s", device->name, device->vendor, device->product, device_type(type));
 
 	if (type == WLR_INPUT_DEVICE_KEYBOARD)
 	{
-		wlr_log(L_INFO, "TODO : handle keyboard");
+		wlr_log(WLR_INFO, "TODO : handle keyboard");
 	}
 	else if (WLR_INPUT_DEVICE_POINTER)
 	{
@@ -42,19 +42,19 @@ void handle_new_input(struct wl_listener* listener, void* data)
 	}
 	else
 	{
-		wlr_log(L_INFO, "Device '%s' not implemented", device_type(type));
+		wlr_log(WLR_INFO, "Device '%s' not implemented", device_type(type));
 	}
 }
 
 struct input* create_input(struct server* server)
 {
-	wlr_log(L_DEBUG, "Creating input");
+	wlr_log(WLR_DEBUG, "Creating input");
 	assert(server);
 
 	struct input* input = calloc(1, sizeof(struct input));
 	if (input == NULL)
 	{
-		wlr_log(L_ERROR, "Failed to create input");
+		wlr_log(WLR_ERROR, "Failed to create input");
 		return NULL;
 	}
 
