@@ -7,7 +7,7 @@
 #include <wlr/types/wlr_gamma_control.h>
 #include <wlr/types/wlr_idle.h>
 #include <wlr/types/wlr_idle_inhibit_v1.h>
-#include <wlr/types/wlr_linux_dmabuf.h>
+#include <wlr/types/wlr_linux_dmabuf_v1.h>
 #include <wlr/types/wlr_primary_selection.h>
 #include <wlr/types/wlr_screenshooter.h>
 #include <wlr/types/wlr_server_decoration.h>
@@ -34,7 +34,7 @@ struct backend
 	struct wlr_primary_selection_device_manager* wlr_primary_selection_device_manager;
 	struct wlr_idle* wlr_idle;
 	struct wlr_idle_inhibit_manager_v1* wlr_idle_inhibit;
-	struct wlr_linux_dmabuf* wlr_linux_dmabuf;
+	struct wlr_linux_dmabuf_v1* wlr_linux_dmabuf;
 
 	struct wlr_xdg_shell_v6* wlr_xdg_shell_v6;
 
