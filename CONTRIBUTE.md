@@ -67,11 +67,11 @@ Brackets always goes on the next line, also including single statements for `if`
 ```c
 struct something
 {
-	char* name;
-	struct stuff* stuff;
+	char *name;
+	struct stuff *stuff;
 };
 
-void process_something(const something* something)
+void process_something(const something *something)
 {
 	if (condition1)
 	{
@@ -109,14 +109,13 @@ bspwc is written in [snake_case](https://en.wikipedia.org/wiki/Snake_case).
 
 ### Pointers
 
-The `*` goes next to the type. If you must declare two pointers on the same
-line, don't. Do it on two lines and initialize them both to `NULL`. If a pointer
-is not allocated or copied on the same line it has been declared, then it must
-be initialized to `NULL`.
+If you must declare two pointers on the same line, don't. Do it on two lines
+and initialize them both to `NULL`. If a pointer is not allocated or copied on
+the same line it has been declared, then it must be initialized to `NULL`.
 
 ```c
-char* name = NULL;
-char* other_name = NULL;
+char *name = NULL;
+char *other_name = NULL;
 
 name = get_name();
 ```
