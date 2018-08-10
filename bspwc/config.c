@@ -1,15 +1,29 @@
 #include <stdbool.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include <wlr/util/log.h>
 
 #include "bspwc/config.h"
 
 // config file is executed.
-// TODO: find a more explicative name?
 bool load_config_file(const char* file)
 {
 	wlr_log(WLR_INFO, "Loading config file %s", file);
-
-	return true;
+	int status;
+	if (fork() == 0)
+	{
+		execl(file, file, NULL);
+		exit(EXIT_FAILURE);
+	}
+	// Wait for the subprocess to finish and get the status, which contains
+	// the exit status of the subprocess. You can access it using the
+	// WIFEXITED and WEXITSTATUS macros.
+	wait(&status);
+	if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
+	{
+		return true;
+	}
+	return false;
 }
-
