@@ -17,6 +17,7 @@ bspwc_deps = [
 	wayland_server,
 	wlroots,
 	pixman,
+	xkbcommon,
 ]
 
 executable(

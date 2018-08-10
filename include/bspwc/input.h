@@ -17,6 +17,7 @@ struct input
 	struct server* server;
 
 	struct cursor* cursor;
+	struct keyboard* keyboard;
 
 	struct wl_listener new_input;
 };

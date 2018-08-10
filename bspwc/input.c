@@ -31,7 +31,10 @@ void handle_new_input(struct wl_listener* listener, void* data)
 
 	if (type == WLR_INPUT_DEVICE_KEYBOARD)
 	{
-		wlr_log(WLR_INFO, "TODO : handle keyboard");
+		if (input->keyboard == NULL)
+		{
+			input->keyboard = create_keyboard(input, device);
+		}
 	}
 	else if (WLR_INPUT_DEVICE_POINTER)
 	{
@@ -61,6 +64,7 @@ struct input* create_input(struct server* server)
 	input->server = server;
 
 	input->cursor = NULL;
+	input->keyboard = NULL;
 
 	input->new_input.notify = handle_new_input;
 	wl_signal_add(&server->backend->wlr_backend->events.new_input, &input->new_input);
