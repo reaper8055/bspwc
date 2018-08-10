@@ -46,3 +46,8 @@ struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* d
 
 	return keyboard;
 }
+
+void destroy_keyboard(struct keyboard* keyboard)
+{
+	free(keyboard);
+}

@@ -78,6 +78,10 @@ void destroy_input(struct input* input)
 	{
 		destroy_cursor(input->cursor);
 	}
+	if (input->keyboard != NULL)
+	{
+		destroy_keyboard(input->keyboard);
+	}
 
 	free(input);
 }
