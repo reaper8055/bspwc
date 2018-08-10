@@ -7,6 +7,7 @@
 #include <wlr/types/wlr_seat.h>
 
 #include "bspwc/cursor.h"
+#include "bspwc/keyboard.h"
 #include "bspwc/server.h"
 
 #define INPUT_DEFAULT_SEAT_NAME "DEFAULT_SEAT"
