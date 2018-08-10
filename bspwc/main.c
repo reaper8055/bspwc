@@ -155,15 +155,13 @@ int main(int argc, char *argv[])
 		strcat(config_file, BSPWC_DEFAULT_CONFIG_FILE);
 	}
 
-/*
-	TODO: load up config file
 	if (!load_config_file(config_file))
 	{
 		wlr_log(WLR_ERROR, "Failed to load config file");
-		terminate_server(&bspwc);
+		terminate_server(&server);
 		exit(EXIT_FAILURE);
 	}
-*/
+
 	signal(SIGINT, sig_handler);
 
 	wl_display_run(server.display);
