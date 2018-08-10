@@ -4,6 +4,7 @@ bspwc_src = files(
 	'cursor.c',
 	'desktop.c',
 	'input.c',
+	'keyboard.c',
 	'main.c',
 	'output.c',
 	'server.c',
