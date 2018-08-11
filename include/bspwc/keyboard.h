@@ -17,7 +17,7 @@ struct keyboard {
 struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* device);
 void destroy_keyboard(struct keyboard *keyboard);
 
-void handle_keyboard_key(struct keyboard *keyboard, void* data);
+void handle_keyboard_key(struct wl_listener* listener, void* data);
 void handle_keyboard_modifiers(struct keyboard *keyboard);
 
 #endif

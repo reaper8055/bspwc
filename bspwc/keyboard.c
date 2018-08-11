@@ -5,6 +5,18 @@
 #include "bspwc/keyboard.h"
 #include "bspwc/input.h"
 
+void handle_keyboard_key(struct wl_listener* listener, void* data)
+{
+	struct keyboard* keyboard = wl_container_of(listener, keyboard, key);
+	struct wlr_event_keyboard_key* event = data;
+
+	xkb_keycode_t keycode = event->keycode + 8;
+	wlr_log(WLR_DEBUG, "Key pressed");
+}
+
+void handle_keyboard_modifiers(struct keyboard* keyboard)
+{}
+
 struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* device)
 {
 	struct keyboard* keyboard = calloc(1, sizeof(keyboard));
@@ -43,6 +55,9 @@ struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* d
 	wlr_keyboard_set_keymap(device->keyboard, keymap);
 	xkb_keymap_unref(keymap);
 	xkb_context_unref(context);
+
+	keyboard->key.notify = handle_keyboard_key;
+	wl_signal_add(&keyboard->device->keyboard->events.key, &keyboard->key);
 
 	return keyboard;
 }
