@@ -31,7 +31,7 @@ void handle_keyboard_modifiers(struct keyboard* keyboard)
 
 struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* device)
 {
-	struct keyboard* keyboard = calloc(1, sizeof(keyboard));
+	struct keyboard* keyboard = calloc(1, sizeof(struct keyboard));
 	if (keyboard == NULL)
 	{
 		wlr_log(WLR_ERROR, "Failed to create keyboard");
