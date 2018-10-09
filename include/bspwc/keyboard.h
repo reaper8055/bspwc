@@ -14,7 +14,8 @@ struct keyboard {
 	struct wl_listener modifiers;
 };
 
-struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* device);
+struct keyboard* create_keyboard(struct input* input,
+	struct wlr_input_device* device);
 void destroy_keyboard(struct keyboard *keyboard);
 
 void handle_keyboard_key(struct wl_listener* listener, void* data);

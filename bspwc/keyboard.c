@@ -10,7 +10,8 @@ void handle_keyboard_key(struct wl_listener* listener, void* data)
 	struct keyboard* keyboard = wl_container_of(listener, keyboard, key);
 	struct wlr_event_keyboard_key* event = data;
 
-	struct xkb_state *state = xkb_state_new(keyboard->device->keyboard->keymap);
+	struct xkb_state *state =
+		xkb_state_new(keyboard->device->keyboard->keymap);
 	if (state == NULL)
 	{
 		wlr_log(WLR_ERROR, "Failed to create xkb state");
@@ -29,7 +30,8 @@ void handle_keyboard_key(struct wl_listener* listener, void* data)
 void handle_keyboard_modifiers(struct keyboard* keyboard)
 {}
 
-struct keyboard* create_keyboard(struct input* input, struct wlr_input_device* device)
+struct keyboard* create_keyboard(struct input* input,
+		struct wlr_input_device* device)
 {
 	struct keyboard* keyboard = calloc(1, sizeof(struct keyboard));
 	if (keyboard == NULL)
