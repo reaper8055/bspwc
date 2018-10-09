@@ -4,21 +4,26 @@
 #include <stdbool.h>
 
 #include "bspwc/config.h"
+#include "bspwc/server.h"
 #include "bspwc/window.h"
+
+struct server;
+struct backend;
 
 struct node
 {
-	struct window* window;
+	struct window *window;
 
-	struct node* parent;
-	struct node* left;
-	struct node* right;
+	struct node *parent;
+	struct node *left;
+	struct node *right;
 };
 
-struct node* node_create();
-void node_destroy(struct node* node);
+struct node *create_node();
+void destroy_node(struct node *node);
 
-bool insert(enum insert_mode mode, struct node* root, struct node* child);
-bool is_leaf(struct node* node);
+bool insert_node(const struct server *server, struct node **root,
+		struct node* child);
+void render_tree(const struct node *root);
 
 #endif // TREE_H

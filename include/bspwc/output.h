@@ -5,8 +5,6 @@
 #define _POSIX_C_SOURCE 200112L
 #endif
 
-#include <time.h>
-
 #include <wayland-server.h>
 #include <wlr/render/wlr_renderer.h>
 #include <wlr/types/wlr_matrix.h>
@@ -18,10 +16,10 @@
 
 struct output
 {
-	struct server* server;
-	struct desktop* desktop;
+	struct server *server;
+	struct desktop *desktop;
 
-	struct wlr_output* wlr_output;
+	struct wlr_output *wlr_output;
 	struct timespec last_frame;
 
 	struct wl_listener destroy;

@@ -1,9 +1,9 @@
 #include "bspwc/tree.h"
 
-struct node* node_create()
+struct node *create_node()
 {
 	wlr_log(WLR_DEBUG, "Creating node");
-	struct node* node = calloc(1, sizeof(struct node));
+	struct node *node = malloc(sizeof(struct node));
 
 	node->window = NULL;
 
@@ -14,100 +14,128 @@ struct node* node_create()
 	return node;
 }
 
-void node_destroy(struct node* node)
+void destroy_node(struct node *node)
 {
 	wlr_log(WLR_DEBUG, "Destroying node");
 	if (node->left != NULL)
 	{
-		node_destroy(node->left);
+		destroy_node(node->left);
 	}
 
 	if (node->right != NULL)
 	{
-		node_destroy(node->right);
+		destroy_node(node->right);
 	}
 
-	free(node->window);
+	destroy_window(node->window);
+
 	free(node);
 }
 
-bool insert(enum insert_mode mode, struct node* root, struct node* child)
+bool insert_node(const struct server *server, struct node **root,
+		struct node *child)
 {
-	if (root == NULL || child == NULL)
+	const struct config *config = server->config;
+	const struct output *output = get_current_output(server);
+
+	if (config->mode == AUTOMATIC)
 	{
-		wlr_log(WLR_ERROR, "Root or child are NULL");
-	}
-
-	wlr_log(WLR_DEBUG, "Inserting %p", (void*)child);
-
-	struct node* candidate = root;
-
-	while (true)
-	{
-		wlr_log(WLR_DEBUG, "Candidate %p", (void*)candidate);
-		// Real root case
-		if (candidate->parent == NULL)
-		{
-			if ((candidate->left == NULL) && (candidate->right == NULL))
-			{
-				wlr_log(WLR_DEBUG, "Insert at root");
-				break;
-			}
-		}
-
-		if (mode == RIGHT)
-		{
-			if (candidate->right != NULL)
-			{
-				candidate = candidate->right;
-				continue;
-			}
-			else
-			{
-				break;
-			}
-		}
-		else if ((mode == LEFT) && (candidate->left != NULL))
-		{
-			if (candidate->left != NULL)
-			{
-				candidate = candidate->left;
-				continue;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		wlr_log(WLR_ERROR, "Error founding insertion candidate");
+		wlr_log(WLR_INFO, "Automatic insertion mode is not implemented");
 		return false;
-
 	}
 
-	struct node* new_child = node_create();
-	new_child->window = root->window;
-	new_child->parent = root;
-	child->parent = root;
-	root->window = NULL;
+	if (*root == NULL)
+	{
+		wlr_log(WLR_DEBUG, "Inserting %p at root", (void*)child);
 
-	if (mode == RIGHT)
-	{
-		wlr_log(WLR_DEBUG, "Inserting into right of %p", (void*)root);
-		root->left = new_child;
-		root->right = child;
+		*root = child;
+
+		// TODO: padding
+		position_window((*root)->window, 0, 0);
+		resize_window((*root)->window, output->wlr_output->width,
+				output->wlr_output->height);
 	}
-	else if (mode == LEFT)
+	else // *root != NULL
 	{
-		wlr_log(WLR_DEBUG, "Inserting into left of %p", (void*)root);
-		root->left = child;
-		root->right = new_child;
+		wlr_log(WLR_DEBUG, "Inserting %p into %p", (void*)child, (void*)root);
+
+		double x = (*root)->window->x;
+		double y = (*root)->window->y;
+		uint32_t width = (*root)->window->width;
+		uint32_t height = (*root)->window->height;
+
+		struct node* other_child = create_node();
+		other_child->window = (*root)->window;
+		(*root)->window = NULL;
+
+		if (config->polarity == LEFT)
+		{
+			(*root)->left = child;
+			(*root)->right = other_child;
+		}
+		else // config->polarity == RIGHT
+		{
+			(*root)->left = other_child;
+			(*root)->right = child;
+		}
+
+		other_child->parent = (*root);
+		child->parent = (*root);
+
+
+		if (config->split == VERTICAL)
+		{
+			// Resize left
+			position_window((*root)->left->window, x, y);
+			resize_window((*root)->left->window, (width / 2), height);
+
+			// Resize right
+			position_window((*root)->right->window, x + ((double)width / 2), y);
+			resize_window((*root)->right->window, (width / 2), height);
+		}
+		else // config->split == HORIZONTAL
+		{
+			wlr_log(WLR_ERROR, "Horizontal split is not implemented");
+			return false;
+		}
 	}
 
 	return true;
 }
 
-bool is_leaf(struct node* node)
+static int time_log = 0;
+void render_tree(const struct node *root)
 {
-	return (node != NULL && node->parent != NULL && node->left == NULL && node->right == NULL);
+	if (root == NULL)
+	{
+		return;
+	}
+
+	if (root->window != NULL)
+	{
+		time_log++;
+
+		// TODO: Remove before merge
+		if (time_log == 120)
+		{
+			wlr_log(WLR_INFO, "Rendering %p %f,%f %lu,%lu", root->window,
+					root->window->x, root->window->y, (unsigned long)root->window->width,
+					(unsigned long)root->window->height);
+			
+			time_log = 0;
+		}
+		render_window(root->window);
+	}
+	else // root->window == NULL
+	{
+		if (root->left != NULL)
+		{
+			render_tree(root->left);
+		}
+
+		if (root->right != NULL)
+		{
+			render_tree(root->right);
+		}
+	}
 }

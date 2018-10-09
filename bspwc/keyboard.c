@@ -5,10 +5,10 @@
 #include "bspwc/keyboard.h"
 #include "bspwc/input.h"
 
-void handle_keyboard_key(struct wl_listener* listener, void* data)
+void handle_keyboard_key(struct wl_listener *listener, void *data)
 {
-	struct keyboard* keyboard = wl_container_of(listener, keyboard, key);
-	struct wlr_event_keyboard_key* event = data;
+	struct keyboard *keyboard = wl_container_of(listener, keyboard, key);
+	struct wlr_event_keyboard_key *event = data;
 
 	struct xkb_state *state =
 		xkb_state_new(keyboard->device->keyboard->keymap);
@@ -27,13 +27,13 @@ void handle_keyboard_key(struct wl_listener* listener, void* data)
 	wlr_log(WLR_DEBUG, "%s", keysym_name);
 }
 
-void handle_keyboard_modifiers(struct keyboard* keyboard)
+void handle_keyboard_modifiers(struct keyboard *keyboard)
 {}
 
-struct keyboard* create_keyboard(struct input* input,
-		struct wlr_input_device* device)
+struct keyboard *create_keyboard(struct input *input,
+		struct wlr_input_device *device)
 {
-	struct keyboard* keyboard = calloc(1, sizeof(struct keyboard));
+	struct keyboard *keyboard = calloc(1, sizeof(struct keyboard));
 	if (keyboard == NULL)
 	{
 		wlr_log(WLR_ERROR, "Failed to create keyboard");
@@ -51,15 +51,15 @@ struct keyboard* create_keyboard(struct input* input,
 		.options = getenv("XKB_DEFAULT_OPTIONS"),
 	};
 
-	struct xkb_context* context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+	struct xkb_context *context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 	if (context == NULL)
 	{
 		wlr_log(WLR_ERROR, "Cannot create XKB context");
 		return NULL;
 	}
 
-	struct xkb_keymap* keymap = xkb_map_new_from_names(context, &rules,
-		XKB_KEYMAP_COMPILE_NO_FLAGS);
+	struct xkb_keymap *keymap = xkb_map_new_from_names(context, &rules,
+			XKB_KEYMAP_COMPILE_NO_FLAGS);
 	if (keymap == NULL) {
 		xkb_context_unref(context);
 		wlr_log(WLR_ERROR, "Cannot create XKB keymap");
@@ -76,7 +76,7 @@ struct keyboard* create_keyboard(struct input* input,
 	return keyboard;
 }
 
-void destroy_keyboard(struct keyboard* keyboard)
+void destroy_keyboard(struct keyboard *keyboard)
 {
 	free(keyboard);
 }
