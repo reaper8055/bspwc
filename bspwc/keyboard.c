@@ -5,6 +5,17 @@
 #include "bspwc/keyboard.h"
 #include "bspwc/input.h"
 
+bool handle_keybinding(uint32_t modifiers, const xkb_keysym_t *syms, int nsyms)
+{
+	char keysym_name[64];
+	for (int i=0; i < nsyms; i++)
+	{
+		xkb_keysym_get_name(syms[i], keysym_name, sizeof(keysym_name));
+		wlr_log(WLR_DEBUG, "%s", keysym_name);
+	}
+	return false;
+}
+
 void handle_keyboard_key(struct wl_listener *listener, void *data)
 {
 	struct keyboard *keyboard = wl_container_of(listener, keyboard, key);
@@ -19,12 +30,20 @@ void handle_keyboard_key(struct wl_listener *listener, void *data)
 
 	// Have to add 8 to convert libinput keycode to libxkbcommon
 	xkb_keycode_t keycode = event->keycode + 8;
-	xkb_keysym_t keysym = xkb_state_key_get_one_sym(state, keycode);
+	const xkb_keysym_t *syms;
+	int nsyms = xkb_state_key_get_syms(
+			keyboard->device->keyboard->xkb_state, keycode, &syms);
 
-	char keysym_name[64];
-	xkb_keysym_get_name(keysym, keysym_name, sizeof(keysym_name));
-
-	wlr_log(WLR_DEBUG, "%s", keysym_name);
+	uint32_t modifiers =
+		wlr_keyboard_get_modifiers(keyboard->device->keyboard);
+	bool handled = handle_keybinding(modifiers, syms, nsyms);
+	
+	if (!handled)
+	{
+		wlr_seat_set_keyboard(keyboard->input->seat, keyboard->device);
+		wlr_seat_keyboard_notify_key(keyboard->input->seat,
+				event->time_msec, event->keycode, event->state);
+	}
 }
 
 void handle_keyboard_modifiers(struct keyboard *keyboard)
