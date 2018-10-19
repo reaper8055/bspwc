@@ -7,6 +7,7 @@
 #include <wlr/types/wlr_seat.h>
 
 #include "bspwc/cursor.h"
+#include "bspwc/keyboard.h"
 #include "bspwc/server.h"
 
 #define INPUT_DEFAULT_SEAT_NAME "BSPWC_DEFAULT_SEAT"
@@ -18,7 +19,7 @@ struct input
 	struct wlr_seat *seat;
 
 	struct cursor *cursor;
-	// keyboard
+	struct keyboard* keyboard;
 
 	struct wl_listener new_input;
 	struct wl_listener request_cursor;

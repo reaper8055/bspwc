@@ -31,7 +31,10 @@ void handle_new_input(struct wl_listener *listener, void *data)
 
 	if (type == WLR_INPUT_DEVICE_KEYBOARD)
 	{
-		wlr_log(WLR_INFO, "TODO : handle keyboard");
+		if (input->keyboard == NULL)
+		{
+			input->keyboard = create_keyboard(input, device);
+		}
 	}
 	else if (WLR_INPUT_DEVICE_POINTER)
 	{
@@ -42,8 +45,8 @@ void handle_new_input(struct wl_listener *listener, void *data)
 	}
 	else
 	{
-		wlr_log(WLR_INFO, "Device %s (%s) not implemented", device->name,
-				device_type(type));
+		wlr_log(WLR_INFO, "Device %s (%s) not implemented",
+				device->name, device_type(type));
 	}
 }
 
@@ -75,6 +78,7 @@ struct input *create_input(struct server *server)
 	}
 
 	input->cursor = NULL;
+	input->keyboard = NULL;
 
 	input->new_input.notify = handle_new_input;
 	wl_signal_add(&server->backend->wlr_backend->events.new_input,
@@ -96,6 +100,10 @@ void destroy_input(struct input *input)
 	if (input->cursor != NULL)
 	{
 		destroy_cursor(input->cursor);
+	}
+	if (input->keyboard != NULL)
+	{
+		destroy_keyboard(input->keyboard);
 	}
 
 	free(input);
