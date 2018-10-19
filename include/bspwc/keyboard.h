@@ -20,6 +20,6 @@ void destroy_keyboard(struct keyboard *keyboard);
 
 bool handle_keybinding(uint32_t modifiers, const xkb_keysym_t *syms, int nsyms);
 void handle_keyboard_key(struct wl_listener *listener, void *data);
-void handle_keyboard_modifiers(struct keyboard *keyboard);
+void handle_keyboard_modifiers(struct wl_listener *listener, void *data);
 
 #endif

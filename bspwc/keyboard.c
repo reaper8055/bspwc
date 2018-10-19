@@ -7,6 +7,7 @@
 
 bool handle_keybinding(uint32_t modifiers, const xkb_keysym_t *syms, int nsyms)
 {
+	// TODO: Make this a real thing by copying sxhkd's functionality
 	char keysym_name[64];
 	for (int i=0; i < nsyms; i++)
 	{
@@ -46,8 +47,10 @@ void handle_keyboard_key(struct wl_listener *listener, void *data)
 	}
 }
 
-void handle_keyboard_modifiers(struct keyboard *keyboard)
-{}
+void handle_keyboard_modifiers(struct wl_listener *listener, void *data)
+{
+	// TODO
+}
 
 struct keyboard *create_keyboard(struct input *input,
 		struct wlr_input_device *device)
@@ -74,6 +77,7 @@ struct keyboard *create_keyboard(struct input *input,
 	if (context == NULL)
 	{
 		wlr_log(WLR_ERROR, "Cannot create XKB context");
+		destroy_keyboard(keyboard);
 		return NULL;
 	}
 
@@ -86,11 +90,21 @@ struct keyboard *create_keyboard(struct input *input,
 	}
 
 	wlr_keyboard_set_keymap(device->keyboard, keymap);
+	
+	// TODO: Make these configurable
+	int repeat_rate = 25;
+	int repeat_delay = 600;
+	wlr_keyboard_set_repeat_info(device->keyboard, repeat_rate,
+			repeat_delay);
+
 	xkb_keymap_unref(keymap);
 	xkb_context_unref(context);
 
 	keyboard->key.notify = handle_keyboard_key;
 	wl_signal_add(&keyboard->device->keyboard->events.key, &keyboard->key);
+	keyboard->modifiers.notify = handle_keyboard_modifiers;
+	wl_signal_add(&keyboard->device->keyboard->events.modifiers,
+			&keyboard->modifiers);
 
 	return keyboard;
 }
