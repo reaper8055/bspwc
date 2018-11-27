@@ -9,6 +9,23 @@
 #include "bspwc/server.h"
 #include "bspwc/window.h"
 
+struct xdg_popup_v6
+{
+	struct wlr_xdg_popup_v6 *wlr_popup;
+
+	struct wl_listener destroy;
+	struct wl_listener map;
+	struct wl_listener unmap;
+	struct wl_listener new_popup;
+};
+
+void handle_xdg_popup_v6_destroy(struct wl_listener *listener, void *data);
+void handle_xdg_popup_v6_new_popup(struct wl_listener *listener, void *data);
+void handle_xdg_popup_v6_map(struct wl_listener *listener, void *data);
+void handle_xdg_popup_v6_unmap(struct wl_listener *listener, void *data);
+
+struct xdg_popup_v6 *create_xdg_popup_v6(struct wlr_xdg_popup_v6 *wlr_popup);
+
 struct xdg_surface_v6
 {
 	struct window *window;

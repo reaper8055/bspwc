@@ -1,5 +1,72 @@
 #include "bspwc/xdg_surface_v6.h"
 
+void handle_xdg_popup_v6_destroy(struct wl_listener *listener, void *data)
+{
+	struct xdg_popup_v6 *popup = wl_container_of(listener, popup, destroy);
+	assert(popup);
+
+	wlr_log(WLR_DEBUG, "TODO: xdg_popup_v6_destroy %p", (void*)popup);
+}
+
+void handle_xdg_popup_v6_map(struct wl_listener *listener, void *data)
+{
+	struct xdg_popup_v6 *popup = wl_container_of(listener, popup, map);
+	assert(popup);
+
+	wlr_log(WLR_DEBUG, "TODO: xdg_popup_v6_map %p", (void*)popup);
+}
+
+void handle_xdg_popup_v6_unmap(struct wl_listener *listener, void *data)
+{
+	struct xdg_popup_v6 *popup = wl_container_of(listener, popup, unmap);
+	assert(popup);
+
+	wlr_log(WLR_DEBUG, "TODO: xdg_popup_v6_unmap %p", (void*)popup);
+}
+
+void handle_xdg_popup_v6_new_popup(struct wl_listener *listener, void *data)
+{
+	struct xdg_popup_v6 *popup = wl_container_of(listener, popup, new_popup);
+	assert(popup);
+
+	wlr_log(WLR_DEBUG, "TODO: xdg_popup_v6_new_popup %p", (void*)popup);
+}
+
+struct xdg_popup_v6 *create_xdg_popup_v6(struct wlr_xdg_popup_v6 *wlr_popup)
+{
+	wlr_log(WLR_DEBUG, "Creating new xdg_popup_v6");
+	struct xdg_popup_v6 *popup = malloc(sizeof(struct xdg_popup_v6));
+	if (popup == NULL)
+	{
+		wlr_log(WLR_ERROR, "Failed to allocate new xdg_popup_v6");
+		return NULL;
+	}
+
+	popup->wlr_popup = wlr_popup;
+
+	/*
+	 * Mapping xdg_popup_v6 listeners
+	 */
+	popup->destroy.notify = handle_xdg_popup_v6_destroy;
+	wl_signal_add(&wlr_popup->base->events.destroy, &popup->destroy);
+
+	popup->map.notify = handle_xdg_popup_v6_map;
+	wl_signal_add(&wlr_popup->base->events.map, &popup->map);
+
+	popup->unmap.notify = handle_xdg_popup_v6_unmap;
+	wl_signal_add(&wlr_popup->base->events.unmap, &popup->unmap);
+
+	popup->new_popup.notify = handle_xdg_popup_v6_new_popup;
+	wl_signal_add(&wlr_popup->base->events.new_popup, &popup->new_popup);
+
+	wlr_log(WLR_DEBUG, "Xdg_popup_v6 %p created", (void*)popup);
+	return popup;
+}
+
+/*
+ * xdg_surface_v6
+ */
+
 void handle_xdg_surface_v6_commit(struct wl_listener *listener, void *data)
 {
 	wlr_log(WLR_DEBUG, "Handle xdg surface v6 commit");
