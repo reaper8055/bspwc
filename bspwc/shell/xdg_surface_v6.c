@@ -1,4 +1,8 @@
-#include "bspwc/xdg_surface_v6.h"
+#include "bspwc/shell/xdg_surface_v6.h"
+
+/*
+ * xdg_popup_v6
+ */
 
 void handle_xdg_popup_v6_destroy(struct wl_listener *listener, void *data)
 {
@@ -29,10 +33,21 @@ void handle_xdg_popup_v6_new_popup(struct wl_listener *listener, void *data)
 	struct xdg_popup_v6 *popup = wl_container_of(listener, popup, new_popup);
 	assert(popup);
 
-	wlr_log(WLR_DEBUG, "TODO: xdg_popup_v6_new_popup %p", (void*)popup);
+	wlr_log(WLR_DEBUG, "xdg_popup_v6 %p new popup", (void*) popup);
+
+	struct wlr_xdg_popup_v6 *wlr_popup = data;
+	assert(wlr_popup);
+
+	struct xdg_popup_v6 *new_popup = create_xdg_popup_v6(popup->xdg_surface_v6,
+			wlr_popup);
+	if (new_popup == NULL)
+	{
+		wlr_log(WLR_ERROR, "Failed to create xdg_popup_v6");
+	}
 }
 
-struct xdg_popup_v6 *create_xdg_popup_v6(struct wlr_xdg_popup_v6 *wlr_popup)
+struct xdg_popup_v6 *create_xdg_popup_v6(struct xdg_surface_v6 *xdg_surface_v6,
+		struct wlr_xdg_popup_v6 *wlr_popup)
 {
 	wlr_log(WLR_DEBUG, "Creating new xdg_popup_v6");
 	struct xdg_popup_v6 *popup = malloc(sizeof(struct xdg_popup_v6));
@@ -42,6 +57,7 @@ struct xdg_popup_v6 *create_xdg_popup_v6(struct wlr_xdg_popup_v6 *wlr_popup)
 		return NULL;
 	}
 
+	popup->xdg_surface_v6 = xdg_surface_v6;
 	popup->wlr_popup = wlr_popup;
 
 	/*
@@ -102,7 +118,18 @@ void handle_xdg_surface_v6_destroy(struct wl_listener *listener, void *data)
 
 void handle_xdg_surface_v6_new_popup(struct wl_listener *listener, void *data)
 {
-	wlr_log(WLR_DEBUG, "Handle xdg surface v6 new poopup");
+	struct xdg_surface_v6 *xdg_surface_v6 = wl_container_of(listener,
+			xdg_surface_v6, new_popup);
+	assert(xdg_surface_v6);
+
+	wlr_log(WLR_DEBUG, "xdg_surface_v6 %p new popup", (void*) xdg_surface_v6);
+
+	struct wlr_xdg_popup_v6 *wlr_popup = data;
+	struct xdg_popup_v6 *popup = create_xdg_popup_v6(xdg_surface_v6, wlr_popup);
+	if (popup == NULL)
+	{
+		wlr_log(WLR_ERROR, "Failed to create xdg_popup_v6");
+	}
 }
 
 void handle_xdg_surface_v6_map(struct wl_listener *listener, void *data)

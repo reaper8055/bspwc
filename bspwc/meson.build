@@ -10,7 +10,7 @@ bspwc_src = files(
 	'server.c',
 	'tree.c',
 	'window.c',
-	'xdg_surface_v6.c',
+	'shell/xdg_surface_v6.c',
 )
 
 bspwc_deps = [

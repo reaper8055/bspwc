@@ -20,7 +20,6 @@
 #include "bspwc/config.h"
 #include "bspwc/input.h"
 #include "bspwc/output.h"
-#include "bspwc/xdg_surface_v6.h"
 
 struct server
 {

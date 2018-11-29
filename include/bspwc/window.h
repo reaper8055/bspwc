@@ -11,7 +11,7 @@
 
 #include "bspwc/backend.h"
 #include "bspwc/desktop.h"
-#include "bspwc/xdg_surface_v6.h"
+#include "bspwc/shell/xdg_surface_v6.h"
 
 enum window_type
 {
