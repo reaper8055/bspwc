@@ -31,7 +31,6 @@ void output_frame_notify(struct wl_listener* listener, void* data)
 
 		wlr_output_swap_buffers(wlr_output, NULL, NULL);
 	wlr_renderer_end(renderer);
-
 }
 
 void new_output_notify(struct wl_listener* listener, void* data)
