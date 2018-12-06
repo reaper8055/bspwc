@@ -35,11 +35,13 @@ struct window
 	union
 	{
 		struct wlr_xdg_surface_v6 *wlr_xdg_surface_v6;
+		struct wlr_xdg_surface *wlr_xdg_surface;
 	};
 
 	union
 	{
 		struct xdg_surface_v6 *xdg_surface_v6;
+		struct xdg_surface *xdg_surface;
 	};
 
 	struct wlr_surface *wlr_surface;
