@@ -80,8 +80,8 @@ void resize_window(struct window *window, uint32_t width, uint32_t height)
 	switch (window->type)
 	{
 	case XDG_SHELL_V6:
-		resize_xdg_shell_v6(window, width, height);
-		break;
+		//resize_xdg_shell_v6(window, width, height);
+		//break;
 	case WL_SHELL:
 	case XDG_SHELL:
 	case XWAYLAND:

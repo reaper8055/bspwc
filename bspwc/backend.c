@@ -37,8 +37,8 @@ struct backend* create_backend(struct server* server)
 	backend->new_output.notify = new_output_notify;
 	wl_signal_add(&backend->wlr_backend->events.new_output, &backend->new_output);
 
-	backend->new_xdg_shell_v6.notify = handle_xdg_shell_v6_surface;
-	wl_signal_add(&backend->wlr_xdg_shell_v6->events.new_surface, &backend->new_xdg_shell_v6);
+	//backend->new_xdg_shell_v6.notify = handle_xdg_shell_v6_surface;
+	//wl_signal_add(&backend->wlr_xdg_shell_v6->events.new_surface, &backend->new_xdg_shell_v6);
 
 	return backend;
 }
