@@ -9,12 +9,14 @@
 #include "bspwc/cursor.h"
 #include "bspwc/keyboard.h"
 #include "bspwc/server.h"
+#include "bspwc/window.h"
 
 #define INPUT_DEFAULT_SEAT_NAME "BSPWC_DEFAULT_SEAT"
 
 struct input
 {
 	struct server *server;
+	struct window *focus;
 
 	struct wlr_seat *seat;
 

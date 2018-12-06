@@ -85,6 +85,7 @@ struct input *create_input(struct server *server)
 	}
 
 	input->server = server;
+	input->focus = NULL;
 
 	input->seat = wlr_seat_create(server->display, INPUT_DEFAULT_SEAT_NAME);
 	if (input->seat == NULL)
