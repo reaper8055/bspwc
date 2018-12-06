@@ -19,6 +19,7 @@
 #include "bspwc/server.h"
 #include "bspwc/window.h"
 #include "bspwc/tree.h"
+#include "bspwc/shell/xdg_surface.h"
 
 // Forward declaration for backend
 struct window;
@@ -38,10 +39,14 @@ struct backend
 	struct wlr_idle_inhibit_manager_v1 *wlr_idle_inhibit;
 	struct wlr_linux_dmabuf_v1 *wlr_linux_dmabuf;
 
-	struct wlr_xdg_shell_v6 *wlr_xdg_shell_v6;
+	struct wlr_xdg_shell_v6 *xdg_shell_v6;
+	struct wlr_xdg_shell *xdg_shell;
 
-	struct wl_listener new_xdg_shell_v6;
 	struct wl_listener new_output;
+
+	// Shell listeners
+	struct wl_listener new_xdg_surface_v6;
+	struct wl_listener new_xdg_surface;
 
 	struct wl_list outputs; // output::link
 };
