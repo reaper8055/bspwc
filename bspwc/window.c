@@ -108,34 +108,52 @@ void render_window(const struct window *window)
 
 void focus_window(struct window *window)
 {
+	// Cannot focus empty window
 	if (window == NULL)
 	{
 		return;
 	}
 
 	struct server *server = window->desktop->output->server;
+	assert(server);
 	struct input *input = server->input;
-	struct wlr_seat *seat = input->seat;
-	struct wlr_surface *previous_surface = seat->keyboard_state.focused_surface;
+	assert(input);
 
-	if (previous_surface == window->wlr_surface)
+	struct window *previous_focus = input->focus;
+	if (previous_focus == window)
 	{
 		return;
 	}
 
 	wlr_log(WLR_DEBUG, "Focusing window %p", (void*)window);
 
-	if (previous_surface)
+	if (previous_focus)
 	{
-		// FIXME: make that modular for other surfaces
-		struct wlr_xdg_surface_v6 *previous_xdg_v6 =
-			wlr_xdg_surface_v6_from_wlr_surface(previous_surface);
-		wlr_xdg_toplevel_v6_set_activated(previous_xdg_v6, false);
+		activate_window(previous_focus, false);
 	}
 
-	wlr_xdg_toplevel_v6_set_activated(window->wlr_xdg_surface_v6, true);
+	activate_window(window, true);
+	input->focus = window;
 
+	// FIXME: move this logic to the input structure
+	struct wlr_seat *seat = input->seat;
 	struct wlr_keyboard *keyboard = wlr_seat_get_keyboard(seat);
 	wlr_seat_keyboard_notify_enter(seat, window->wlr_surface,
 			keyboard->keycodes, keyboard->num_keycodes, &keyboard->modifiers);
+}
+
+void activate_window(struct window *window, bool status)
+{
+	switch (window->type)
+	{
+	case XDG_SHELL:
+		wlr_xdg_toplevel_set_activated(window->wlr_xdg_surface, status);
+		break;
+	case XDG_SHELL_V6:
+	case WL_SHELL:
+	case XWAYLAND:
+	case NONE:
+	default:
+		wlr_log(WLR_ERROR, "Unknown surface type");
+	}
 }

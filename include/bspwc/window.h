@@ -7,6 +7,7 @@
 
 #include <time.h>
 
+#include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/types/wlr_xdg_shell_v6.h>
 
 #include "bspwc/backend.h"
@@ -60,5 +61,6 @@ void set_window_position(struct window *window, const double x, const double y);
 void resize_window(struct window *window, uint32_t width, uint32_t height);
 void render_window(const struct window *window);
 void focus_window(struct window *window);
+void activate_window(struct window *window, bool status);
 
 #endif // WINDOW_H
