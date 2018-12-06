@@ -183,7 +183,7 @@ struct output *get_current_output(const struct server *server)
 	if (wlr_output == NULL)
 	{
 		wlr_log(WLR_ERROR, "Failed to get active wlr_output");
-		return false;
+		return NULL;
 	}
 
 	// Find the right output
